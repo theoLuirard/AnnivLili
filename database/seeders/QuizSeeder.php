@@ -20,13 +20,13 @@ class QuizSeeder extends Seeder
             NumericQuiz::create([
                 'question' => 'Combien de pays sont membres de l\'ONU ?',
                 'correct_answer' => 193,
-                'description' => 'Pensez aux tats indpendants reconnus par l\'ONU',
+                'description' => 'Pensez aux états indépendants reconnus par l\'ONU',
                 'status' => 'draft',
                 'created_by' => $admin->id,
             ]);
 
             NumericQuiz::create([
-                'question' => 'Quel est le plus haut sommet du monde en mtres ?',
+                'question' => 'Quel est le plus haut sommet du monde en mètres ?',
                 'correct_answer' => 8849,
                 'description' => 'C\'est en Asie du Sud',
                 'status' => 'draft',
@@ -34,7 +34,7 @@ class QuizSeeder extends Seeder
             ]);
 
             NumericQuiz::create([
-                'question' => 'En quel anne l\'homme a march sur la lune ?',
+                'question' => 'En quelle année l\'homme a marché sur la lune ?',
                 'correct_answer' => 1969,
                 'description' => 'Apollo 11',
                 'status' => 'draft',

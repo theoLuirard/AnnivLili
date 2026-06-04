@@ -23,7 +23,118 @@ class QuizController extends Controller
 
         $leaderboard = QuizScore::getLeaderboard();
 
-        return view('quiz.show', compact('activeQuiz', 'userResponse', 'leaderboard'));
+        $hasClosedQuizzes = NumericQuiz::where('status', 'closed')->exists();
+        $showPodium = !$activeQuiz && $hasClosedQuizzes && $leaderboard->count() > 0;
+        $topWinners = $leaderboard->take(3)->values();
+
+        // Pass initial state as JSON for the polling/overlay JS
+        $closedQuiz = null;
+        $initialState = ['status' => 'waiting'];
+        if ($activeQuiz) {
+            $initialState = [
+                'status' => 'active',
+                'quiz_id' => $activeQuiz->id,
+                'has_answered' => $userResponse !== null,
+            ];
+        } else {
+            $closedQuiz = NumericQuiz::where('status', 'closed')
+                ->orderBy('updated_at', 'desc')
+                ->first();
+            if ($closedQuiz) {
+                $initialState = $this->buildClosedState($closedQuiz);
+            }
+        }
+
+        return view('quiz.show', compact(
+            'activeQuiz', 'userResponse', 'leaderboard',
+            'showPodium', 'topWinners', 'initialState'
+        ));
+    }
+
+    public function state()
+    {
+        $activeQuiz = NumericQuiz::where('status', 'active')->first();
+
+        if ($activeQuiz) {
+            $userResponse = QuizResponse::where('quiz_id', $activeQuiz->id)
+                ->where('user_id', Auth::id())
+                ->first();
+
+            return response()->json([
+                'status'       => 'active',
+                'quiz_id'      => $activeQuiz->id,
+                'question'     => $activeQuiz->question,
+                'description'  => $activeQuiz->description,
+                'has_answered' => $userResponse !== null,
+            ]);
+        }
+
+        $closedQuiz = NumericQuiz::where('status', 'closed')
+            ->orderBy('updated_at', 'desc')
+            ->first();
+
+        if ($closedQuiz) {
+            return response()->json($this->buildClosedState($closedQuiz));
+        }
+
+        return response()->json(['status' => 'waiting']);
+    }
+
+    private function buildClosedState(NumericQuiz $quiz): array
+    {
+        $userId = Auth::id();
+
+        $userResponse = QuizResponse::where('quiz_id', $quiz->id)
+            ->where('user_id', $userId)
+            ->first();
+
+        $allResponses = QuizResponse::where('quiz_id', $quiz->id)
+            ->with('user')
+            ->get()
+            ->sortBy(fn($r) => abs((float) $r->numeric_answer - (float) $quiz->correct_answer))
+            ->values();
+
+        $leaderboard = $allResponses->map(function ($r, $index) use ($quiz, $userId) {
+            $diff = abs((float) $r->numeric_answer - (float) $quiz->correct_answer);
+            return [
+                'rank'       => $index + 1,
+                'name'       => $r->user->name,
+                'initials'   => $r->user->initials,
+                'answer'     => (float) $r->numeric_answer,
+                'difference' => $diff,
+                'is_exact'   => (float) $r->numeric_answer == (float) $quiz->correct_answer,
+                'score'      => $r->score,
+                'is_me'      => $r->user_id === $userId,
+            ];
+        })->values()->all();
+
+        $myRank       = null;
+        $myScore      = null;
+        $myAnswer     = null;
+        $myDifference = null;
+        $myIsExact    = false;
+
+        if ($userResponse) {
+            $myRank       = $allResponses->search(fn($r) => $r->user_id === $userId) + 1;
+            $myScore      = $userResponse->score;
+            $myAnswer     = (float) $userResponse->numeric_answer;
+            $myDifference = abs($myAnswer - (float) $quiz->correct_answer);
+            $myIsExact    = $myAnswer == (float) $quiz->correct_answer;
+        }
+
+        return [
+            'status'        => 'closed',
+            'quiz_id'       => $quiz->id,
+            'question'      => $quiz->question,
+            'correct_answer'=> (float) $quiz->correct_answer,
+            'has_answered'  => $userResponse !== null,
+            'my_answer'     => $myAnswer,
+            'my_difference' => $myDifference,
+            'my_is_exact'   => $myIsExact,
+            'my_rank'       => $myRank,
+            'my_score'      => $myScore,
+            'leaderboard'   => $leaderboard,
+        ];
     }
 
     public function submit(Request $request)
@@ -46,7 +157,7 @@ class QuizController extends Controller
 
         if ($existingResponse) {
             return redirect()->route('quiz.show')
-                ->with('error', 'Vous avez dj rpondu  cette question');
+                ->with('error', 'Vous avez déjà répondu à cette question');
         }
 
         // Create response
@@ -58,6 +169,6 @@ class QuizController extends Controller
         ]);
 
         return redirect()->route('quiz.show')
-            ->with('success', 'Rponse enregistre');
+            ->with('success', 'Réponse enregistrée');
     }
 }

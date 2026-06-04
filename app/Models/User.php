@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'nickname', 'profile_picture'])]
+#[Fillable(['name', 'email', 'password', 'nickname', 'profile_picture', 'avatar_color'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -29,5 +29,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        $source = $this->nickname ?: $this->name;
+        return mb_strtoupper(mb_substr($source, 0, 2));
     }
 }
