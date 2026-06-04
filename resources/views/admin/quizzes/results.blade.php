@@ -3,9 +3,17 @@
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="mb-8">
-            <a href="{{ route('admin.quizzes.index') }}" class="text-blue-600 hover:text-blue-900">← Retour</a>
-            <h1 class="text-3xl font-bold text-gray-900 mt-2">Résultats - {{ substr($quiz->question, 0, 50) }}...</h1>
+        <div class="flex justify-between items-start mb-8">
+            <div>
+                <a href="{{ route('admin.quizzes.index') }}" class="text-blue-600 hover:text-blue-900">← Retour</a>
+                <h1 class="text-3xl font-bold text-gray-900 mt-2">Résultats - {{ substr($quiz->question, 0, 50) }}...</h1>
+            </div>
+            @if($responses->count() > 0)
+                <a href="{{ route('admin.quizzes.results.download', $quiz->id) }}"
+                   class="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition font-medium">
+                    ⬇ Télécharger CSV
+                </a>
+            @endif
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -44,6 +52,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Réponse</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Différence</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Score</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Date</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -67,7 +76,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 @php
                                     $diff = abs($response->numeric_answer - $quiz->correct_answer);
-                                    $percentage = round(($diff / $quiz->correct_answer) * 100, 2);
+                                    $percentage = $quiz->correct_answer != 0
+                    ? round(($diff / $quiz->correct_answer) * 100, 2)
+                    : 0;
                                 @endphp
                                 {{ $response->numeric_answer == $quiz->correct_answer ? '✓ Exacte' : $diff . ' (' . $percentage . '%)' }}
                             </td>
@@ -78,10 +89,13 @@
                                     {{ $response->score }} pts
                                 </span>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $response->created_at->format('d/m/Y H:i') }}
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">Aucune réponse</td>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">Aucune réponse</td>
                         </tr>
                     @endforelse
                 </tbody>

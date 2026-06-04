@@ -31,6 +31,12 @@
             </div>
         @endif
 
+        @if (session('error'))
+            <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <h2 class="text-3xl font-bold text-gray-800 mb-6">Edit User</h2>
 
         @if ($errors->any())
@@ -117,6 +123,29 @@
                 </form>
             </div>
         </form>
+
+        <div class="mt-8 p-6 border border-gray-200 rounded-lg">
+            <h3 class="text-xl font-bold text-gray-700 mb-3">Role Management</h3>
+            <div class="flex items-center gap-4">
+                <span class="text-gray-600">Current role:
+                    @if($user->hasRole('admin'))
+                        <span class="inline-block bg-purple-100 text-purple-800 font-semibold px-3 py-1 rounded-full">Admin</span>
+                    @else
+                        <span class="inline-block bg-gray-100 text-gray-700 font-semibold px-3 py-1 rounded-full">User</span>
+                    @endif
+                </span>
+                @if($user->id !== auth()->id())
+                    <form action="{{ route('admin.user.toggle-role', $user->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to change this user\'s role?');">
+                        @csrf
+                        <button type="submit" class="{{ $user->hasRole('admin') ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-purple-500 hover:bg-purple-600' }} text-white font-bold py-2 px-6 rounded-lg transition">
+                            {{ $user->hasRole('admin') ? 'Demote to User' : 'Promote to Admin' }}
+                        </button>
+                    </form>
+                @else
+                    <span class="text-gray-400 text-sm italic">You cannot change your own role.</span>
+                @endif
+            </div>
+        </div>
     </div>
 </body>
 </html>

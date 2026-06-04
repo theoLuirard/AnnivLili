@@ -6,6 +6,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\QuizAdminController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\ScoreboardController;
+use App\Http\Controllers\AdminScoreboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -40,6 +42,11 @@ Route::middleware('auth')->group(function () {
     // Quiz Routes
     Route::get('/quiz', [QuizController::class, 'show'])->name('quiz.show');
     Route::post('/quiz/submit', [QuizController::class, 'submit'])->name('quiz.submit');
+    Route::get('/quiz/state', [QuizController::class, 'state'])->name('quiz.state');
+
+    // Scoreboard
+    Route::get('/scoreboard', [ScoreboardController::class, 'index'])->name('scoreboard.index');
+    Route::get('/scoreboard/history', [ScoreboardController::class, 'history'])->name('scoreboard.history');
 
     // Admin Routes
     Route::middleware('role:admin')->group(function () {
@@ -47,6 +54,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/user/{id}', [AdminController::class, 'showUser'])->name('admin.user.show');
         Route::post('/admin/user/{id}/update', [AdminController::class, 'updateUser'])->name('admin.user.update');
         Route::delete('/admin/user/{id}/delete', [AdminController::class, 'deleteUser'])->name('admin.user.delete');
+        Route::post('/admin/user/{id}/toggle-role', [AdminController::class, 'toggleRole'])->name('admin.user.toggle-role');
 
         // Quiz Admin Routes
         Route::get('/admin/quizzes', [QuizAdminController::class, 'index'])->name('admin.quizzes.index');
@@ -59,5 +67,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/quizzes/{quiz}/reset', [QuizAdminController::class, 'reset'])->name('admin.quizzes.reset');
         Route::delete('/admin/quizzes/{quiz}', [QuizAdminController::class, 'destroy'])->name('admin.quizzes.destroy');
         Route::get('/admin/quizzes/{quiz}/results', [QuizAdminController::class, 'showResults'])->name('admin.quizzes.results');
+        Route::get('/admin/quizzes/{quiz}/results/download', [QuizAdminController::class, 'downloadResults'])->name('admin.quizzes.results.download');
+
+        // Scoreboard Admin Routes
+        Route::get('/admin/scoreboard', [AdminScoreboardController::class, 'index'])->name('admin.scoreboard.index');
+        Route::post('/admin/scoreboard', [AdminScoreboardController::class, 'store'])->name('admin.scoreboard.store');
+        Route::delete('/admin/scoreboard/{entry}', [AdminScoreboardController::class, 'destroy'])->name('admin.scoreboard.destroy');
     });
 });

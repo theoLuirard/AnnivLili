@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Collection;
 
 class QuizResponse extends Model
 {
@@ -31,7 +32,7 @@ class QuizResponse extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function calculateScore(): int
+    public function calculateScore(?Collection $allResponses = null): int
     {
         $correct = (float) $this->quiz->correct_answer;
         $answer = (float) $this->numeric_answer;
@@ -43,14 +44,14 @@ class QuizResponse extends Model
             $score += 3;
         }
 
-        // Get all responses for this quiz
-        $allResponses = QuizResponse::where('quiz_id', $this->quiz_id)
-            ->with('user')
-            ->get()
-            ->sortBy(fn($r) => abs((float)$r->numeric_answer - $correct));
+        // Use provided collection or fetch (fallback for standalone calls)
+        if ($allResponses === null) {
+            $allResponses = QuizResponse::where('quiz_id', $this->quiz_id)->get();
+        }
 
         // Rank this response by proximity
-        $rank = $allResponses->search(fn($r) => $r->id === $this->id);
+        $sorted = $allResponses->sortBy(fn($r) => abs((float)$r->numeric_answer - $correct));
+        $rank = $sorted->search(fn($r) => $r->id === $this->id);
 
         if ($rank === 0) {
             $score += 5; // 1st closest

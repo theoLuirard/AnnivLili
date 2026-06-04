@@ -53,6 +53,25 @@ class AdminController extends Controller
         return redirect()->route('admin.user.show', $user->id)->with('success', 'User updated successfully!');
     }
 
+    public function toggleRole($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->id === auth()->id()) {
+            return redirect()->route('admin.user.show', $user->id)->with('error', 'You cannot change your own role.');
+        }
+
+        if ($user->hasRole('admin')) {
+            $user->syncRoles(['user']);
+            $message = 'User role changed to User.';
+        } else {
+            $user->syncRoles(['admin']);
+            $message = 'User role changed to Admin.';
+        }
+
+        return redirect()->route('admin.user.show', $user->id)->with('success', $message);
+    }
+
     public function deleteUser($id)
     {
         $user = User::findOrFail($id);

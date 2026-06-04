@@ -61,6 +61,7 @@
                         <th class="border border-gray-300 px-6 py-3 text-left">Name</th>
                         <th class="border border-gray-300 px-6 py-3 text-left">Email</th>
                         <th class="border border-gray-300 px-6 py-3 text-left">Nickname</th>
+                        <th class="border border-gray-300 px-6 py-3 text-left">Role</th>
                         <th class="border border-gray-300 px-6 py-3 text-left">Actions</th>
                     </tr>
                 </thead>
@@ -71,14 +72,21 @@
                                 @if($user->profile_picture)
                                     <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="Profile" class="w-10 h-10 rounded-full object-cover">
                                 @else
-                                    <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-xs">
-                                        N/A
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background-color: {{ $user->avatar_color ?? '#6366f1' }}">
+                                        {{ $user->initials }}
                                     </div>
                                 @endif
                             </td>
                             <td class="border border-gray-300 px-6 py-3">{{ $user->name }}</td>
                             <td class="border border-gray-300 px-6 py-3">{{ $user->email }}</td>
                             <td class="border border-gray-300 px-6 py-3">{{ $user->nickname ?? '-' }}</td>
+                            <td class="border border-gray-300 px-6 py-3">
+                                @if($user->hasRole('admin'))
+                                    <span class="inline-block bg-purple-100 text-purple-800 font-semibold px-2 py-1 rounded-full text-xs">Admin</span>
+                                @else
+                                    <span class="inline-block bg-gray-100 text-gray-700 font-semibold px-2 py-1 rounded-full text-xs">User</span>
+                                @endif
+                            </td>
                             <td class="border border-gray-300 px-6 py-3">
                                 <a href="{{ route('admin.user.show', $user->id) }}" class="text-blue-500 hover:underline mr-4">
                                     View/Edit
@@ -87,7 +95,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="border border-gray-300 px-6 py-3 text-center text-gray-500">
+                            <td colspan="6" class="border border-gray-300 px-6 py-3 text-center text-gray-500">
                                 No users found
                             </td>
                         </tr>

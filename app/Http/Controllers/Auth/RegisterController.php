@@ -24,6 +24,8 @@ class RegisterController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
+        $user->assignRole('user');
+
         Auth::login($user);
         return redirect()->route('dashboard');
     }

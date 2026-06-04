@@ -40,8 +40,8 @@
                 @if($user->profile_picture)
                     <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="Profile Picture" class="w-32 h-32 rounded-full mr-6 object-cover">
                 @else
-                    <div class="w-32 h-32 rounded-full mr-6 bg-gray-300 flex items-center justify-center text-gray-600">
-                        No image
+                    <div class="w-32 h-32 rounded-full mr-6 flex items-center justify-center text-white text-3xl font-bold" style="background-color: {{ $user->avatar_color ?? '#6366f1' }}">
+                        {{ $user->initials }}
                     </div>
                 @endif
                 <div>
