@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/user/{id}', [AdminController::class, 'showUser'])->name('admin.user.show');
         Route::post('/admin/user/{id}/update', [AdminController::class, 'updateUser'])->name('admin.user.update');
         Route::delete('/admin/user/{id}/delete', [AdminController::class, 'deleteUser'])->name('admin.user.delete');
+        Route::post('/admin/user/{id}/toggle-role', [AdminController::class, 'toggleRole'])->name('admin.user.toggle-role');
 
         // Quiz Admin Routes
         Route::get('/admin/quizzes', [QuizAdminController::class, 'index'])->name('admin.quizzes.index');
@@ -59,5 +60,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/quizzes/{quiz}/reset', [QuizAdminController::class, 'reset'])->name('admin.quizzes.reset');
         Route::delete('/admin/quizzes/{quiz}', [QuizAdminController::class, 'destroy'])->name('admin.quizzes.destroy');
         Route::get('/admin/quizzes/{quiz}/results', [QuizAdminController::class, 'showResults'])->name('admin.quizzes.results');
+        Route::get('/admin/quizzes/{quiz}/results/download', [QuizAdminController::class, 'downloadResults'])->name('admin.quizzes.results.download');
     });
 });

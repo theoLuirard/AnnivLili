@@ -138,4 +138,54 @@ class QuizAdminController extends Controller
 
         return view('admin.quizzes.results', compact('quiz', 'responses', 'leaderboard'));
     }
+
+    public function downloadResults(NumericQuiz $quiz)
+    {
+        $responses = QuizResponse::where('quiz_id', $quiz->id)
+            ->with('user')
+            ->orderBy('score', 'desc')
+            ->get();
+
+        $filename = 'quiz-results-' . $quiz->id . '-' . now()->format('Y-m-d') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($quiz, $responses) {
+            $handle = fopen('php://output', 'w');
+
+            // Meta info
+            fputcsv($handle, ['Question', $quiz->question]);
+            fputcsv($handle, ['Réponse correcte', $quiz->correct_answer]);
+            fputcsv($handle, ['Statut', ucfirst($quiz->status)]);
+            fputcsv($handle, ['Nombre de réponses', $responses->count()]);
+            fputcsv($handle, []);
+
+            // Column headers
+            fputcsv($handle, ['Position', 'Joueur', 'Réponse', 'Différence', 'Différence %', 'Score', 'Date']);
+
+            foreach ($responses as $index => $response) {
+                $diff = abs((float) $response->numeric_answer - (float) $quiz->correct_answer);
+                $percentage = $quiz->correct_answer != 0
+                    ? round(($diff / (float) $quiz->correct_answer) * 100, 2)
+                    : 0;
+
+                fputcsv($handle, [
+                    $index + 1,
+                    $response->user->name,
+                    $response->numeric_answer,
+                    $response->numeric_answer == $quiz->correct_answer ? 'Exacte' : $diff,
+                    $response->numeric_answer == $quiz->correct_answer ? '0%' : $percentage . '%',
+                    $response->score,
+                    $response->created_at->format('d/m/Y H:i'),
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }
