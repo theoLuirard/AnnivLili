@@ -66,7 +66,42 @@
             </div>
 
             <div class="mb-6">
-                <label for="profile_picture" class="block text-gray-700 font-bold mb-2">Profile Picture</label>
+                <label class="block text-gray-700 font-bold mb-2">Avatar Background Color</label>
+                @if(!$user->profile_picture)
+                    <div class="mb-3 flex items-center gap-3">
+                        <div class="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold" id="avatar-preview" style="background-color: {{ old('avatar_color', $user->avatar_color ?? '#6366f1') }}">
+                            {{ $user->initials }}
+                        </div>
+                        <span class="text-gray-500 text-sm">Preview</span>
+                    </div>
+                @endif
+                <div class="flex flex-wrap gap-3">
+                    @foreach(['#6366f1','#8b5cf6','#ec4899','#f43f5e','#f97316','#f59e0b','#22c55e','#14b8a6','#06b6d4','#3b82f6'] as $color)
+                        <label class="cursor-pointer">
+                            <input type="radio" name="avatar_color" value="{{ $color }}" class="sr-only avatar-color-radio"
+                                {{ old('avatar_color', $user->avatar_color ?? '#6366f1') === $color ? 'checked' : '' }}>
+                            <span class="block w-9 h-9 rounded-full border-4 transition-all"
+                                style="background-color: {{ $color }}; border-color: {{ old('avatar_color', $user->avatar_color ?? '#6366f1') === $color ? '#1e293b' : 'transparent' }}"
+                                data-color="{{ $color }}"></span>
+                        </label>
+                    @endforeach
+                </div>
+                <p class="text-gray-500 text-sm mt-2">Used when no profile picture is set.</p>
+            </div>
+
+            <script>
+                document.querySelectorAll('.avatar-color-radio').forEach(function(radio) {
+                    radio.addEventListener('change', function() {
+                        document.querySelectorAll('.avatar-color-radio + span').forEach(function(span) {
+                            span.style.borderColor = 'transparent';
+                        });
+                        var swatch = this.nextElementSibling;
+                        swatch.style.borderColor = '#1e293b';
+                        var preview = document.getElementById('avatar-preview');
+                        if (preview) preview.style.backgroundColor = this.value;
+                    });
+                });
+            </script>
                 @if($user->profile_picture)
                     <div class="mb-4">
                         <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover">

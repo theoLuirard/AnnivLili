@@ -19,10 +19,13 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+        $avatarColors = ['#6366f1','#8b5cf6','#ec4899','#f43f5e','#f97316','#f59e0b','#22c55e','#14b8a6','#06b6d4','#3b82f6'];
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'nickname' => 'nullable|string|max:255',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'avatar_color' => ['nullable', 'string', 'size:7', 'regex:/^#[0-9a-fA-F]{6}$/', 'in:' . implode(',', $avatarColors)],
         ]);
 
         $user = auth()->user();

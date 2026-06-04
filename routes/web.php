@@ -6,6 +6,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\QuizAdminController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\ScoreboardController;
+use App\Http\Controllers\AdminScoreboardController;
+use App\Http\Controllers\PreferenceController;
+use App\Http\Controllers\PreferenceAdminController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -40,6 +44,16 @@ Route::middleware('auth')->group(function () {
     // Quiz Routes
     Route::get('/quiz', [QuizController::class, 'show'])->name('quiz.show');
     Route::post('/quiz/submit', [QuizController::class, 'submit'])->name('quiz.submit');
+    Route::get('/quiz/state', [QuizController::class, 'state'])->name('quiz.state');
+
+    // Do You Prefer Routes
+    Route::get('/preference', [PreferenceController::class, 'show'])->name('preference.show');
+    Route::get('/preference/state', [PreferenceController::class, 'state'])->name('preference.state');
+    Route::post('/preference/submit', [PreferenceController::class, 'submit'])->name('preference.submit');
+
+    // Scoreboard
+    Route::get('/scoreboard', [ScoreboardController::class, 'index'])->name('scoreboard.index');
+    Route::get('/scoreboard/history', [ScoreboardController::class, 'history'])->name('scoreboard.history');
 
     // Admin Routes
     Route::middleware('role:admin')->group(function () {
@@ -61,5 +75,23 @@ Route::middleware('auth')->group(function () {
         Route::delete('/admin/quizzes/{quiz}', [QuizAdminController::class, 'destroy'])->name('admin.quizzes.destroy');
         Route::get('/admin/quizzes/{quiz}/results', [QuizAdminController::class, 'showResults'])->name('admin.quizzes.results');
         Route::get('/admin/quizzes/{quiz}/results/download', [QuizAdminController::class, 'downloadResults'])->name('admin.quizzes.results.download');
+
+        // Scoreboard Admin Routes
+        Route::get('/admin/scoreboard', [AdminScoreboardController::class, 'index'])->name('admin.scoreboard.index');
+        Route::post('/admin/scoreboard', [AdminScoreboardController::class, 'store'])->name('admin.scoreboard.store');
+        Route::delete('/admin/scoreboard/{entry}', [AdminScoreboardController::class, 'destroy'])->name('admin.scoreboard.destroy');
+
+        // Do You Prefer Admin Routes
+        Route::get('/admin/preference', [PreferenceAdminController::class, 'index'])->name('admin.preference.index');
+        Route::get('/admin/preference/create', [PreferenceAdminController::class, 'create'])->name('admin.preference.create');
+        Route::post('/admin/preference', [PreferenceAdminController::class, 'store'])->name('admin.preference.store');
+        Route::get('/admin/preference/{game}/manage', [PreferenceAdminController::class, 'manage'])->name('admin.preference.manage');
+        Route::post('/admin/preference/{game}/activate', [PreferenceAdminController::class, 'activate'])->name('admin.preference.activate');
+        Route::post('/admin/preference/{game}/close', [PreferenceAdminController::class, 'closeGame'])->name('admin.preference.close');
+        Route::post('/admin/preference/{game}/question/{question}/activate', [PreferenceAdminController::class, 'activateQuestion'])->name('admin.preference.question.activate');
+        Route::post('/admin/preference/{game}/question/{question}/reveal', [PreferenceAdminController::class, 'revealAnswer'])->name('admin.preference.question.reveal');
+        Route::post('/admin/preference/{game}/question/{question}/close', [PreferenceAdminController::class, 'closeQuestion'])->name('admin.preference.question.close');
+        Route::post('/admin/preference/{game}/end-eliminatory', [PreferenceAdminController::class, 'endEliminatoryPhase'])->name('admin.preference.end-eliminatory');
+        Route::delete('/admin/preference/{game}', [PreferenceAdminController::class, 'destroy'])->name('admin.preference.destroy');
     });
 });

@@ -72,8 +72,8 @@
                                 @if($user->profile_picture)
                                     <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="Profile" class="w-10 h-10 rounded-full object-cover">
                                 @else
-                                    <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-xs">
-                                        N/A
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background-color: {{ $user->avatar_color ?? '#6366f1' }}">
+                                        {{ $user->initials }}
                                     </div>
                                 @endif
                             </td>

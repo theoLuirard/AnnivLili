@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Quiz App')</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    @stack('styles')
 </head>
 <body class="bg-gray-50">
     <nav class="bg-white shadow-lg">
@@ -17,10 +18,14 @@
                     @auth
                         <span class="text-gray-700">{{ auth()->user()->name }}</span>
                         <a href="{{ route('quiz.show') }}" class="text-green-600 hover:text-green-900 font-medium">Quiz</a>
+                        <a href="{{ route('preference.show') }}" class="text-pink-600 hover:text-pink-900 font-medium">Tu préfères ?</a>
+                        <a href="{{ route('scoreboard.index') }}" class="text-yellow-600 hover:text-yellow-900 font-medium">🏆 Scores</a>
                         <a href="{{ route('profile.show') }}" class="text-blue-600 hover:text-blue-900 font-medium">Mon Profil</a>
                         @if(auth()->user()->hasRole('admin'))
                             <a href="{{ route('admin.users') }}" class="text-purple-600 hover:text-purple-900 font-medium">Admin</a>
                             <a href="{{ route('admin.quizzes.index') }}" class="text-orange-600 hover:text-orange-900 font-medium">Gérer Quiz</a>
+                            <a href="{{ route('admin.preference.index') }}" class="text-pink-600 hover:text-pink-900 font-medium">Gérer Préférences</a>
+                            <a href="{{ route('admin.scoreboard.index') }}" class="text-teal-600 hover:text-teal-900 font-medium">Gérer Scores</a>
                         @endif
                         <form action="{{ route('logout') }}" method="POST" class="inline">
                             @csrf

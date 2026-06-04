@@ -76,7 +76,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 @php
                                     $diff = abs($response->numeric_answer - $quiz->correct_answer);
-                                    $percentage = round(($diff / $quiz->correct_answer) * 100, 2);
+                                    $percentage = $quiz->correct_answer != 0
+                    ? round(($diff / $quiz->correct_answer) * 100, 2)
+                    : 0;
                                 @endphp
                                 {{ $response->numeric_answer == $quiz->correct_answer ? '✓ Exacte' : $diff . ' (' . $percentage . '%)' }}
                             </td>

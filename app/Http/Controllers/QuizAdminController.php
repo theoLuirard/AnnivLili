@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\NumericQuiz;
 use App\Models\QuizResponse;
+use App\Models\ScoreboardEntry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -37,7 +38,7 @@ class QuizAdminController extends Controller
         NumericQuiz::create($validated);
 
         return redirect()->route('admin.quizzes.index')
-            ->with('success', 'Question cre avec succs');
+            ->with('success', 'Question créée avec succès');
     }
 
     public function edit(NumericQuiz $quiz)
@@ -56,7 +57,7 @@ class QuizAdminController extends Controller
         $quiz->update($validated);
 
         return redirect()->route('admin.quizzes.index')
-            ->with('success', 'Question mise  jour');
+            ->with('success', 'Question mise à jour');
     }
 
     public function activate(NumericQuiz $quiz)
@@ -67,17 +68,17 @@ class QuizAdminController extends Controller
         $quiz->update(['status' => 'active']);
 
         return redirect()->route('admin.quizzes.index')
-            ->with('success', 'Question active');
+            ->with('success', 'Question activée');
     }
 
     public function close(NumericQuiz $quiz)
     {
         $quiz->update(['status' => 'closed']);
 
-        // Recalculate all scores for this quiz
-        $responses = QuizResponse::where('quiz_id', $quiz->id)->get();
+        // Load all responses once with quiz to avoid N+1 in calculateScore
+        $responses = QuizResponse::where('quiz_id', $quiz->id)->with('quiz')->get();
         foreach ($responses as $response) {
-            $score = $response->calculateScore();
+            $score = $response->calculateScore($responses);
             $response->update(['score' => $score]);
         }
 
@@ -87,8 +88,19 @@ class QuizAdminController extends Controller
             \App\Models\QuizScore::updateScore($userId);
         }
 
-        return redirect()->route('admin.quizzes.index')
-            ->with('success', 'Question ferme et scores recalculs');
+        // Award 1 auto scoreboard point per quiz participation
+        foreach ($userIds as $userId) {
+            ScoreboardEntry::create([
+                'user_id'    => $userId,
+                'points'     => 1,
+                'category'   => 'Auto',
+                'note'       => 'Participation au quiz #' . $quiz->id,
+                'awarded_by' => null,
+            ]);
+        }
+
+        return redirect()->route('admin.quizzes.results', $quiz->id)
+            ->with('success', 'Question fermée et scores recalculés');
     }
 
     public function reset(NumericQuiz $quiz)
@@ -124,7 +136,7 @@ class QuizAdminController extends Controller
         $quiz->delete();
 
         return redirect()->route('admin.quizzes.index')
-            ->with('success', 'Question supprime');
+            ->with('success', 'Question supprimée');
     }
 
     public function showResults(NumericQuiz $quiz)
