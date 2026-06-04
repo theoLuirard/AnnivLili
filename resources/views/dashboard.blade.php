@@ -9,7 +9,7 @@
 <body class="bg-gradient-to-br from-blue-500 to-purple-600 min-h-screen">
     <nav class="bg-white shadow-lg">
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">My App</h1>
+            <h1 class="text-2xl font-bold text-gray-800">{{ env('APP_NAME') }}</h1>
             <div>
                 <span class="text-gray-600 mr-4">Welcome, {{ auth()->user()->name }}!</span>
                 <a href="{{ route('quiz.show') }}" class="text-green-500 hover:underline mr-4">Quiz</a>

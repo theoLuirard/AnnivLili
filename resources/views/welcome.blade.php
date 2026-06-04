@@ -9,7 +9,7 @@
 <body class="bg-gradient-to-br from-blue-500 to-purple-600 min-h-screen">
     <nav class="bg-white shadow-lg">
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">My App</h1>
+            <h1 class="text-2xl font-bold text-gray-800">{{ env('APP_NAME') }}</h1>
             <div class="space-x-4">
                 <a href="{{ route('login') }}" class="text-gray-600 hover:text-gray-800">Login</a>
                 <a href="{{ route('register') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Register</a>

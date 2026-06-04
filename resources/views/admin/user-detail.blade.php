@@ -9,7 +9,7 @@
 <body class="bg-gray-100">
     <nav class="bg-white shadow-lg">
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">My App - Admin Panel</h1>
+            <h1 class="text-2xl font-bold text-gray-800">{{ env('APP_NAME') }} - Admin Panel</h1>
             <div>
                 <span class="text-gray-600 mr-4">{{ auth()->user()->name }}</span>
                 <a href="{{ route('dashboard') }}" class="text-blue-500 hover:underline mr-4">Dashboard</a>
