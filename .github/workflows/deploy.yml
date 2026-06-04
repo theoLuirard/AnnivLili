@@ -16,7 +16,7 @@ jobs:
     - name: ⏳ Set up PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.2'
+        php-version: '8.3'
         extensions: mbstring, xml, bcmath, curl, zip
         tools: composer
 
@@ -36,7 +36,7 @@ jobs:
         script: |
           cd /home/forge/tele-lili.la-cpors.com
           git fetch origin
-          git reset --hard origin/main
+          git reset --hard origin/master
           composer install --no-dev --optimize-autoloader
           npm run build
           php artisan migrate --force
