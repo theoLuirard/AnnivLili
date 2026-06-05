@@ -185,6 +185,20 @@ class PreferenceAdminController extends Controller
             ->with('success', 'Jeu terminé');
     }
 
+    public function liveCount(PreferenceGame $game)
+    {
+        $activeQuestion = $game->questions()->where('status', 'active')->first();
+
+        if (!$activeQuestion) {
+            return response()->json(['question_id' => null, 'count' => 0]);
+        }
+
+        return response()->json([
+            'question_id' => $activeQuestion->id,
+            'count'       => $activeQuestion->answers()->count(),
+        ]);
+    }
+
     public function destroy(PreferenceGame $game)
     {
         $game->delete();
