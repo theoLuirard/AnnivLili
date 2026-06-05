@@ -151,6 +151,13 @@ class QuizAdminController extends Controller
         return view('admin.quizzes.results', compact('quiz', 'responses', 'leaderboard'));
     }
 
+    public function liveCount(NumericQuiz $quiz)
+    {
+        return response()->json([
+            'count' => QuizResponse::where('quiz_id', $quiz->id)->count(),
+        ]);
+    }
+
     public function downloadResults(NumericQuiz $quiz)
     {
         $responses = QuizResponse::where('quiz_id', $quiz->id)
