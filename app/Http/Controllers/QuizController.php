@@ -100,13 +100,14 @@ class QuizController extends Controller
                 'rank'       => $index + 1,
                 'name'       => $r->user->name,
                 'initials'   => $r->user->initials,
+                'avatar'     => $r->user->avatar_url,
                 'answer'     => (float) $r->numeric_answer,
                 'difference' => $diff,
                 'is_exact'   => (float) $r->numeric_answer == (float) $quiz->correct_answer,
                 'score'      => $r->score,
                 'is_me'      => $r->user_id === $userId,
             ];
-        })->values()->all();
+        })->sortByDesc('score')->values()->all();
 
         $myRank       = null;
         $myScore      = null;

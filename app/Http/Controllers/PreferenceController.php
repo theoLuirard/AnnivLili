@@ -125,6 +125,7 @@ class PreferenceController extends Controller
             $answerList = $answers->map(fn($a) => [
                 'name'          => $a->user->name,
                 'initials'      => $a->user->initials ?? strtoupper(substr($a->user->name, 0, 2)),
+                'avatar'        => $a->user->avatar_url,
                 'answer'        => $a->answer,
                 'is_correct'    => $a->is_correct,
                 'points_earned' => $a->points_earned,

@@ -36,4 +36,9 @@ class User extends Authenticatable
         $source = $this->nickname ?: $this->name;
         return mb_strtoupper(mb_substr($source, 0, 2));
     }
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        return $this->profile_picture ? asset('storage/' . $this->profile_picture) : null;
+    }
 }

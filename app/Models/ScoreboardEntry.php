@@ -30,10 +30,10 @@ class ScoreboardEntry extends Model
 
     public static function getLeaderboard()
     {
-        return User::select('users.id', 'users.name', 'users.nickname')
+        return User::select('users.id', 'users.name', 'users.nickname', 'users.profile_picture', 'users.avatar_color')
             ->selectRaw('COALESCE(SUM(scoreboard_entries.points), 0) as total_points')
             ->leftJoin('scoreboard_entries', 'users.id', '=', 'scoreboard_entries.user_id')
-            ->groupBy('users.id', 'users.name', 'users.nickname')
+            ->groupBy('users.id', 'users.name', 'users.nickname', 'users.profile_picture', 'users.avatar_color')
             ->orderByDesc('total_points')
             ->get();
     }

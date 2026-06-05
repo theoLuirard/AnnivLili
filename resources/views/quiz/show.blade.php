@@ -458,7 +458,11 @@
                         <div class="podium-player" id="player-2nd">
                             @if ($topWinners->count() >= 2)
                                 <div class="podium-medal">🥈</div>
-                                <div class="podium-avatar">{{ $topWinners[1]->user->initials }}</div>
+                                @if ($topWinners[1]->user->profile_picture)
+                                    <img src="{{ asset('storage/' . $topWinners[1]->user->profile_picture) }}" class="podium-avatar" style="object-fit:cover;" />
+                                @else
+                                    <div class="podium-avatar">{{ $topWinners[1]->user->initials }}</div>
+                                @endif
                                 <div class="podium-name">{{ $topWinners[1]->user->name }}</div>
                                 <div class="podium-score-badge">{{ $topWinners[1]->total_score }} pts</div>
                             @endif
@@ -470,7 +474,11 @@
                         <div class="podium-player" id="player-1st">
                             @if ($topWinners->count() >= 1)
                                 <div class="podium-medal">🥇</div>
-                                <div class="podium-avatar">{{ $topWinners[0]->user->initials }}</div>
+                                @if ($topWinners[0]->user->profile_picture)
+                                    <img src="{{ asset('storage/' . $topWinners[0]->user->profile_picture) }}" class="podium-avatar" style="object-fit:cover;" />
+                                @else
+                                    <div class="podium-avatar">{{ $topWinners[0]->user->initials }}</div>
+                                @endif
                                 <div class="podium-name">{{ $topWinners[0]->user->name }}</div>
                                 <div class="podium-score-badge">{{ $topWinners[0]->total_score }} pts</div>
                             @endif
@@ -482,7 +490,11 @@
                         <div class="podium-player" id="player-3rd">
                             @if ($topWinners->count() >= 3)
                                 <div class="podium-medal">🥉</div>
-                                <div class="podium-avatar">{{ $topWinners[2]->user->initials }}</div>
+                                @if ($topWinners[2]->user->profile_picture)
+                                    <img src="{{ asset('storage/' . $topWinners[2]->user->profile_picture) }}" class="podium-avatar" style="object-fit:cover;" />
+                                @else
+                                    <div class="podium-avatar">{{ $topWinners[2]->user->initials }}</div>
+                                @endif
                                 <div class="podium-name">{{ $topWinners[2]->user->name }}</div>
                                 <div class="podium-score-badge">{{ $topWinners[2]->total_score }} pts</div>
                             @endif
@@ -720,14 +732,14 @@
                     const diffText = r.is_exact ?
                         '<span class="text-green-400 font-semibold">✓ Exacte</span>' :
                         `<span class="text-gray-400">${fmt(r.difference)} d'écart</span>`;
+                    const avatarHtml = r.avatar
+                        ? `<img src="${r.avatar}" class="w-9 h-9 rounded-full object-cover border-2 border-white/30" />`
+                        : `<div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white border-2 border-white/30" style="background: hsl(${(r.rank * 47) % 360}, 60%, 40%)">${r.initials}</div>`;
                     div.innerHTML = `
                 <div class="w-8 text-center">
                     <span class="text-lg font-black ${r.rank <= 3 ? 'text-yellow-300' : 'text-gray-400'}">${rankEmoji || r.rank}</span>
                 </div>
-                <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white border-2 border-white/30"
-                     style="background: hsl(${(r.rank * 47) % 360}, 60%, 40%)">
-                    ${r.initials}
-                </div>
+                ${avatarHtml}
                 <div class="flex-1 min-w-0">
                     <p class="text-white font-semibold text-sm truncate">${r.name}${r.is_me ? ' <span class="text-indigo-300">(vous)</span>' : ''}</p>
                     <p class="text-xs">${diffText} · réponse : <span class="text-gray-300">${fmt(r.answer)}</span></p>
@@ -1144,7 +1156,11 @@
                     <div class="podium-player" id="player-2nd">
                         @if ($topWinners->count() >= 2)
                             <div class="podium-medal">🥈</div>
-                            <div class="podium-avatar">{{ $topWinners[1]->user->initials }}</div>
+                            @if ($topWinners[1]->user->profile_picture)
+                                <img src="{{ asset('storage/' . $topWinners[1]->user->profile_picture) }}" class="podium-avatar" style="object-fit:cover;" />
+                            @else
+                                <div class="podium-avatar">{{ $topWinners[1]->user->initials }}</div>
+                            @endif
                             <div class="podium-name">{{ $topWinners[1]->user->name }}</div>
                             <div class="podium-score-badge">{{ $topWinners[1]->total_score }} pts</div>
                         @endif
@@ -1157,7 +1173,11 @@
                     <div class="podium-player" id="player-1st">
                         @if ($topWinners->count() >= 1)
                             <div class="podium-medal">🥇</div>
-                            <div class="podium-avatar">{{ $topWinners[0]->user->initials }}</div>
+                            @if ($topWinners[0]->user->profile_picture)
+                                <img src="{{ asset('storage/' . $topWinners[0]->user->profile_picture) }}" class="podium-avatar" style="object-fit:cover;" />
+                            @else
+                                <div class="podium-avatar">{{ $topWinners[0]->user->initials }}</div>
+                            @endif
                             <div class="podium-name">{{ $topWinners[0]->user->name }}</div>
                             <div class="podium-score-badge">{{ $topWinners[0]->total_score }} pts</div>
                         @endif
@@ -1170,7 +1190,11 @@
                     <div class="podium-player" id="player-3rd">
                         @if ($topWinners->count() >= 3)
                             <div class="podium-medal">🥉</div>
-                            <div class="podium-avatar">{{ $topWinners[2]->user->initials }}</div>
+                            @if ($topWinners[2]->user->profile_picture)
+                                <img src="{{ asset('storage/' . $topWinners[2]->user->profile_picture) }}" class="podium-avatar" style="object-fit:cover;" />
+                            @else
+                                <div class="podium-avatar">{{ $topWinners[2]->user->initials }}</div>
+                            @endif
                             <div class="podium-name">{{ $topWinners[2]->user->name }}</div>
                             <div class="podium-score-badge">{{ $topWinners[2]->total_score }} pts</div>
                         @endif

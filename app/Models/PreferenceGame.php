@@ -76,6 +76,7 @@ class PreferenceGame extends Model
                     'user_id'  => $userId,
                     'name'     => $user->name,
                     'initials' => $user->initials ?? strtoupper(substr($user->name, 0, 2)),
+                    'avatar'   => $user->avatar_url,
                     'points'   => $answers->sum('points_earned'),
                     'correct'  => $answers->where('is_correct', true)->count(),
                     'total'    => $answers->count(),
