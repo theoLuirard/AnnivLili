@@ -6,6 +6,7 @@ use App\Models\PreferenceGame;
 use App\Models\PreferenceQuestion;
 use App\Models\PreferenceAnswer;
 use App\Models\PreferenceElimination;
+use App\Models\ScoreboardEntry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -179,10 +180,33 @@ class PreferenceAdminController extends Controller
     {
         // Close any open question
         $game->questions()->whereIn('status', ['active', 'revealing'])->update(['status' => 'closed']);
-        $game->update(['status' => 'closed', 'is_eliminatory_phase' => false]);
+        $game->update(['status' => 'closed', 'is_eliminatory_phase' => false, 'show_podium' => true]);
 
-        return redirect()->route('admin.preference.index')
-            ->with('success', 'Jeu terminé');
+        // Add scoreboard entries for points earned during this game
+        $leaderboard = $game->getGameLeaderboard();
+        foreach ($leaderboard as $entry) {
+            if ($entry['points'] > 0) {
+                ScoreboardEntry::create([
+                    'user_id'    => $entry['user_id'],
+                    'points'     => $entry['points'],
+                    'category'   => 'Games',
+                    'origin'     => 'preference:' . $game->id,
+                    'note'       => 'Jeu de préférences : ' . $game->title,
+                    'awarded_by' => null,
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.preference.manage', $game->id)
+            ->with('success', 'Jeu terminé — le podium est affiché aux joueurs');
+    }
+
+    public function dismissPodium(PreferenceGame $game)
+    {
+        $game->update(['show_podium' => false]);
+
+        return redirect()->route('admin.preference.manage', $game->id)
+            ->with('success', 'Podium masqué');
     }
 
     public function liveCount(PreferenceGame $game)
@@ -201,6 +225,9 @@ class PreferenceAdminController extends Controller
 
     public function destroy(PreferenceGame $game)
     {
+        // Remove any scoreboard entries previously awarded for this game
+        ScoreboardEntry::where('origin', 'preference:' . $game->id)->delete();
+
         $game->delete();
 
         return redirect()->route('admin.preference.index')
