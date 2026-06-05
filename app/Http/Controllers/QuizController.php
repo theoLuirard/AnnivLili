@@ -7,11 +7,14 @@ use App\Models\QuizResponse;
 use App\Models\QuizScore;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class QuizController extends Controller
 {
     public function show()
     {
+        $finaleActive = Cache::get('quiz_finale_active', false);
+
         $activeQuiz = NumericQuiz::where('status', 'active')->first();
         $userResponse = null;
 
@@ -22,18 +25,26 @@ class QuizController extends Controller
         }
 
         $leaderboard = QuizScore::getLeaderboard();
-
         $hasClosedQuizzes = NumericQuiz::where('status', 'closed')->exists();
-        $showPodium = !$activeQuiz && $hasClosedQuizzes && $leaderboard->count() > 0;
+        $showPodium = $finaleActive || (!$activeQuiz && $hasClosedQuizzes && $leaderboard->count() > 0);
         $topWinners = $leaderboard->take(3)->values();
 
-        // Pass initial state as JSON for the polling/overlay JS
-        $closedQuiz = null;
         $initialState = ['status' => 'waiting'];
-        if ($activeQuiz) {
+
+        if ($finaleActive) {
             $initialState = [
-                'status' => 'active',
-                'quiz_id' => $activeQuiz->id,
+                'status'      => 'finale',
+                'top_winners' => $topWinners->map(fn($s, $i) => [
+                    'rank'        => $i + 1,
+                    'name'        => $s->user->name,
+                    'initials'    => $s->user->initials,
+                    'total_score' => $s->total_score,
+                ])->values()->all(),
+            ];
+        } elseif ($activeQuiz) {
+            $initialState = [
+                'status'       => 'active',
+                'quiz_id'      => $activeQuiz->id,
                 'has_answered' => $userResponse !== null,
             ];
         } else {
@@ -53,6 +64,19 @@ class QuizController extends Controller
 
     public function state()
     {
+        if (Cache::get('quiz_finale_active')) {
+            $winners = QuizScore::getLeaderboard()->take(3)->values();
+            return response()->json([
+                'status'      => 'finale',
+                'top_winners' => $winners->map(fn($s, $i) => [
+                    'rank'        => $i + 1,
+                    'name'        => $s->user->name,
+                    'initials'    => $s->user->initials,
+                    'total_score' => $s->total_score,
+                ])->values()->all(),
+            ]);
+        }
+
         $activeQuiz = NumericQuiz::where('status', 'active')->first();
 
         if ($activeQuiz) {
@@ -91,7 +115,10 @@ class QuizController extends Controller
         $allResponses = QuizResponse::where('quiz_id', $quiz->id)
             ->with('user')
             ->get()
-            ->sortBy(fn($r) => abs((float) $r->numeric_answer - (float) $quiz->correct_answer))
+            ->sortBy([
+                fn($r) => abs((float) $r->numeric_answer - (float) $quiz->correct_answer),
+                fn($r) => $r->created_at->timestamp,
+            ])
             ->values();
 
         $leaderboard = $allResponses->map(function ($r, $index) use ($quiz, $userId) {

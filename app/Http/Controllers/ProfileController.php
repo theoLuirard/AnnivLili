@@ -24,7 +24,7 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'nickname' => 'nullable|string|max:255',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
             'avatar_color' => ['nullable', 'string', 'size:7', 'regex:/^#[0-9a-fA-F]{6}$/', 'in:' . implode(',', $avatarColors)],
         ]);
 

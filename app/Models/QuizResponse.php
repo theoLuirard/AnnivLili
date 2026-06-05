@@ -35,32 +35,23 @@ class QuizResponse extends Model
     public function calculateScore(?Collection $allResponses = null): int
     {
         $correct = (float) $this->quiz->correct_answer;
-        $answer = (float) $this->numeric_answer;
-
-        $score = 0;
-
-        // Check if exact match
-        if ($answer == $correct) {
-            $score += 3;
-        }
 
         // Use provided collection or fetch (fallback for standalone calls)
         if ($allResponses === null) {
             $allResponses = QuizResponse::where('quiz_id', $this->quiz_id)->get();
         }
 
-        // Rank this response by proximity
-        $sorted = $allResponses->sortBy(fn($r) => abs((float)$r->numeric_answer - $correct));
+        // Rank by proximity, speed (created_at) as tiebreaker
+        $sorted = $allResponses->sortBy([
+            fn($r) => abs((float) $r->numeric_answer - $correct),
+            fn($r) => $r->created_at->timestamp,
+        ]);
         $rank = $sorted->search(fn($r) => $r->id === $this->id);
 
-        if ($rank === 0) {
-            $score += 5; // 1st closest
-        } elseif ($rank === 1) {
-            $score += 2; // 2nd closest
-        } elseif ($rank === 2) {
-            $score += 1; // 3rd closest
-        }
+        if ($rank === 0) return 10; // 1st
+        if ($rank === 1) return 5;  // 2nd
+        if ($rank === 2) return 2;  // 3rd
 
-        return $score;
+        return 0;
     }
 }
