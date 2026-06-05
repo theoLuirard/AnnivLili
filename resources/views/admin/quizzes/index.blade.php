@@ -22,6 +22,44 @@
             </div>
         @endif
 
+        {{-- ── Finale Panel ──────────────────────────────────────────── --}}
+        @php
+            $finaleActive = cache('quiz_finale_active', false);
+            $hasScores = \App\Models\QuizScore::count() > 0;
+        @endphp
+        @if ($finaleActive || $hasScores)
+            <div class="mb-6 p-5 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4
+                {{ $finaleActive ? 'bg-yellow-50 border-2 border-yellow-400' : 'bg-purple-50 border border-purple-200' }}">
+                <div>
+                    @if ($finaleActive)
+                        <p class="text-2xl font-black text-yellow-800">🏆 Podium Final actif</p>
+                        <p class="text-sm text-yellow-700 mt-1">Tous les joueurs voient actuellement l'animation du podium final.</p>
+                    @else
+                        <p class="text-xl font-bold text-purple-900">🏁 Clore le Quiz</p>
+                        <p class="text-sm text-purple-700 mt-1">Affiche l'animation du podium final à tous les joueurs connectés.</p>
+                    @endif
+                </div>
+                @if ($finaleActive)
+                    <form action="{{ route('admin.quiz.finale.hide') }}" method="POST">
+                        @csrf
+                        <button type="submit"
+                            class="bg-gray-600 text-white px-5 py-2 rounded-lg hover:bg-gray-700 font-semibold whitespace-nowrap">
+                            Masquer le podium
+                        </button>
+                    </form>
+                @else
+                    <form action="{{ route('admin.quiz.finale.show') }}" method="POST"
+                          onsubmit="return confirm('Afficher le podium final à tous les joueurs ?')">
+                        @csrf
+                        <button type="submit"
+                            class="bg-purple-600 text-white px-5 py-2 rounded-lg hover:bg-purple-700 font-semibold text-lg whitespace-nowrap">
+                            🏆 Afficher le Podium Final
+                        </button>
+                    </form>
+                @endif
+            </div>
+        @endif
+
         <div class="bg-white shadow rounded-lg overflow-hidden">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-100">
@@ -69,8 +107,9 @@
                                     </form>
                                 @endif
 
-                                @if ($quiz->isClosed())
-                                    <form action="{{ route('admin.quizzes.reset', $quiz->id) }}" method="POST" class="inline" onclick="return confirm('Êtes-vous sûr? Cela supprimera toutes les réponses.')">
+                                @if (!$quiz->isDraft())
+                                    <form action="{{ route('admin.quizzes.reset', $quiz->id) }}" method="POST" class="inline"
+                                        onsubmit="return confirm('Réinitialiser ce quiz ? Toutes les réponses{{ $quiz->isClosed() ? " et les points de participation" : "" }} seront supprimés.')">
                                         @csrf
                                         <button type="submit" class="text-yellow-600 hover:text-yellow-900">Réinitialiser</button>
                                     </form>
