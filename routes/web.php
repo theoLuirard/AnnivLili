@@ -77,6 +77,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/quizzes/{quiz}/results/download', [QuizAdminController::class, 'downloadResults'])->name('admin.quizzes.results.download');
         Route::get('/admin/quizzes/{quiz}/live-count', [QuizAdminController::class, 'liveCount'])->name('admin.quizzes.live-count');
 
+        // Quiz Finale Routes
+        Route::post('/admin/quiz/finale', [QuizAdminController::class, 'showFinale'])->name('admin.quiz.finale.show');
+        Route::post('/admin/quiz/finale/hide', [QuizAdminController::class, 'hideFinale'])->name('admin.quiz.finale.hide');
+
         // Scoreboard Admin Routes
         Route::get('/admin/scoreboard', [AdminScoreboardController::class, 'index'])->name('admin.scoreboard.index');
         Route::post('/admin/scoreboard', [AdminScoreboardController::class, 'store'])->name('admin.scoreboard.store');
@@ -89,6 +93,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/preference/{game}/manage', [PreferenceAdminController::class, 'manage'])->name('admin.preference.manage');
         Route::post('/admin/preference/{game}/activate', [PreferenceAdminController::class, 'activate'])->name('admin.preference.activate');
         Route::post('/admin/preference/{game}/close', [PreferenceAdminController::class, 'closeGame'])->name('admin.preference.close');
+        Route::post('/admin/preference/{game}/dismiss-podium', [PreferenceAdminController::class, 'dismissPodium'])->name('admin.preference.dismiss-podium');
         Route::post('/admin/preference/{game}/question/{question}/activate', [PreferenceAdminController::class, 'activateQuestion'])->name('admin.preference.question.activate');
         Route::post('/admin/preference/{game}/question/{question}/reveal', [PreferenceAdminController::class, 'revealAnswer'])->name('admin.preference.question.reveal');
         Route::post('/admin/preference/{game}/question/{question}/close', [PreferenceAdminController::class, 'closeQuestion'])->name('admin.preference.question.close');

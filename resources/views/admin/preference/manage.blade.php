@@ -33,6 +33,13 @@
                     <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">■ Terminer le jeu</button>
                 </form>
             @endif
+            @if($game->show_podium)
+                <form action="{{ route('admin.preference.dismiss-podium', $game->id) }}" method="POST"
+                      onsubmit="return confirm('Masquer le podium pour les joueurs ?')">
+                    @csrf
+                    <button class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">🏆 Masquer le podium</button>
+                </form>
+            @endif
             @if($game->is_eliminatory_phase)
                 <form action="{{ route('admin.preference.end-eliminatory', $game->id) }}" method="POST"
                       onsubmit="return confirm('Mettre fin à la phase éliminatoire ? Tous les joueurs éliminés reviendront.')">
