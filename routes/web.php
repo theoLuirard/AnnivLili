@@ -13,7 +13,7 @@ use App\Http\Controllers\PreferenceAdminController;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
 
 // Authentication Routes
 Route::get('/login', function () {
@@ -75,6 +75,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/admin/quizzes/{quiz}', [QuizAdminController::class, 'destroy'])->name('admin.quizzes.destroy');
         Route::get('/admin/quizzes/{quiz}/results', [QuizAdminController::class, 'showResults'])->name('admin.quizzes.results');
         Route::get('/admin/quizzes/{quiz}/results/download', [QuizAdminController::class, 'downloadResults'])->name('admin.quizzes.results.download');
+        Route::get('/admin/quizzes/{quiz}/live-count', [QuizAdminController::class, 'liveCount'])->name('admin.quizzes.live-count');
 
         // Scoreboard Admin Routes
         Route::get('/admin/scoreboard', [AdminScoreboardController::class, 'index'])->name('admin.scoreboard.index');
@@ -93,5 +94,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/preference/{game}/question/{question}/close', [PreferenceAdminController::class, 'closeQuestion'])->name('admin.preference.question.close');
         Route::post('/admin/preference/{game}/end-eliminatory', [PreferenceAdminController::class, 'endEliminatoryPhase'])->name('admin.preference.end-eliminatory');
         Route::delete('/admin/preference/{game}', [PreferenceAdminController::class, 'destroy'])->name('admin.preference.destroy');
+        Route::get('/admin/preference/{game}/live-count', [PreferenceAdminController::class, 'liveCount'])->name('admin.preference.live-count');
     });
 });

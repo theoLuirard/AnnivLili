@@ -491,10 +491,16 @@
                     </div>
                 </div>
 
-                <button id="podium-close-btn" onclick="document.getElementById('podium-overlay').classList.add('hidden')"
-                    class="mt-2 px-8 py-3 bg-white text-purple-900 font-bold text-lg rounded-full shadow-lg hover:bg-yellow-300 hover:text-purple-900 transition-all duration-300 hover:scale-105">
-                    Voir le classement complet →
-                </button>
+                <div class="flex flex-col sm:flex-row gap-3 mt-2">
+                    <a href="{{ route('scoreboard.index') }}"
+                        class="px-8 py-3 bg-white text-purple-900 font-bold text-lg rounded-full shadow-lg hover:bg-yellow-300 hover:text-purple-900 transition-all duration-300 hover:scale-105 text-center">
+                        Voir le classement complet →
+                    </a>
+                    <a href="{{ route('dashboard') }}"
+                        class="px-8 py-3 bg-purple-700 border-2 border-white text-white font-bold text-lg rounded-full shadow-lg hover:bg-purple-500 transition-all duration-300 hover:scale-105 text-center">
+                        ← Retour au menu
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -1179,11 +1185,17 @@
                 </div>
             </div>
 
-            {{-- Close button --}}
-            <button id="podium-close-btn" onclick="document.getElementById('podium-overlay').classList.add('hidden')"
-                class="mt-2 px-8 py-3 bg-white text-purple-900 font-bold text-lg rounded-full shadow-lg hover:bg-yellow-300 hover:text-purple-900 transition-all duration-300 hover:scale-105">
-                Voir le classement complet →
-            </button>
+            {{-- Navigation buttons --}}
+            <div class="flex flex-col sm:flex-row gap-3 mt-2">
+                <a href="{{ route('scoreboard.index') }}"
+                    class="px-8 py-3 bg-white text-purple-900 font-bold text-lg rounded-full shadow-lg hover:bg-yellow-300 hover:text-purple-900 transition-all duration-300 hover:scale-105 text-center">
+                    Voir le classement complet →
+                </a>
+                <a href="{{ route('dashboard') }}"
+                    class="px-8 py-3 bg-purple-700 border-2 border-white text-white font-bold text-lg rounded-full shadow-lg hover:bg-purple-500 transition-all duration-300 hover:scale-105 text-center">
+                    ← Retour au menu
+                </a>
+            </div>
         </div>
     </div>
 

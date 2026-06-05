@@ -101,7 +101,11 @@
 
                         {{-- Answers count --}}
                         <p class="text-sm text-gray-500 mb-4">
-                            {{ $question->answers->count() }} réponse(s)
+                            <span @if($question->isActive()) id="answer-count-{{ $question->id }}" @endif>{{ $question->answers->count() }}</span>
+                            réponse(s)
+                            @if($question->isActive())
+                                <span class="ml-1 inline-block w-2 h-2 rounded-full bg-green-400 animate-pulse align-middle" title="En direct"></span>
+                            @endif
                             @if($question->correct_answer)
                                 — ✅ {{ $question->answers->where('is_correct', true)->count() }} correct(s)
                                 / ❌ {{ $question->answers->where('is_correct', false)->count() }} faux
@@ -222,3 +226,26 @@
 </div>
 </div>
 @endsection
+
+@php $activeQuestion = $game->questions->firstWhere('status', 'active'); @endphp
+@if($game->isActive() && $activeQuestion)
+@push('scripts')
+<script>
+(function () {
+    const gameId = {{ $game->id }};
+    let trackedQuestionId = {{ $activeQuestion->id }};
+
+    setInterval(async () => {
+        try {
+            const res = await fetch('/admin/preference/' + gameId + '/live-count');
+            if (!res.ok) return;
+            const data = await res.json();
+            if (!data.question_id) return;
+            const el = document.getElementById('answer-count-' + data.question_id);
+            if (el) el.textContent = data.count;
+        } catch (e) {}
+    }, 3000);
+})();
+</script>
+@endpush
+@endif

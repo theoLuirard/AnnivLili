@@ -84,6 +84,7 @@ const POLL_INTERVAL = 2500;
 let lastQuestionId = null;
 let lastQuestionStatus = null;
 let lastGameStatus = null;
+let lastHasAnswered = false;
 let hasAnswered = false;
 
 const csrfToken = '{{ csrf_token() }}';
@@ -293,24 +294,35 @@ async function poll() {
         return;
     }
 
+    const qs = state.question_status;
+    const questionChanged = state.question_id !== lastQuestionId;
+    const statusChanged   = qs !== lastQuestionStatus;
+    const answeredChanged = state.has_answered !== lastHasAnswered;
+
     // Detect new question → reset hasAnswered
-    if (state.question_id && state.question_id !== lastQuestionId) {
+    if (questionChanged && state.question_id) {
         hasAnswered = state.has_answered || false;
         lastQuestionId = state.question_id;
     }
 
     if (state.has_answered) hasAnswered = true;
 
-    const qs = state.question_status;
-
     if (!qs || qs === 'waiting') {
-        content.innerHTML = renderGameWaiting(state);
+        if (statusChanged || questionChanged) {
+            content.innerHTML = renderGameWaiting(state);
+        }
     } else if (qs === 'active') {
-        content.innerHTML = renderQuestion(state);
+        if (questionChanged || statusChanged || answeredChanged) {
+            content.innerHTML = renderQuestion(state);
+        }
     } else if (qs === 'revealing') {
-        content.innerHTML = renderRevealing(state);
+        if (questionChanged || statusChanged) {
+            content.innerHTML = renderRevealing(state);
+        }
     } else {
-        content.innerHTML = renderGameWaiting(state);
+        if (statusChanged || questionChanged) {
+            content.innerHTML = renderGameWaiting(state);
+        }
     }
 
     // Leaderboard
@@ -323,6 +335,7 @@ async function poll() {
 
     lastQuestionStatus = qs;
     lastGameStatus = state.status;
+    lastHasAnswered = state.has_answered || false;
 }
 
 // Initial render then start polling
