@@ -3,41 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Quiz App')</title>
+    <title>@yield('title', config('app.name', 'Télé Lili'))</title>
     <script src="https://cdn.tailwindcss.com"></script>
     @stack('styles')
 </head>
-<body class="bg-gray-50">
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <a href="{{ route('dashboard') }}" class="text-2xl font-bold text-blue-600">Télé Lili</a>
-                </div>
-                <div class="flex items-center space-x-4">
-                    @auth
-                        <span class="text-gray-700">{{ auth()->user()->name }}</span>
-                        <a href="{{ route('quiz.show') }}" class="text-green-600 hover:text-green-900 font-medium">Quiz</a>
-                        <a href="{{ route('preference.show') }}" class="text-pink-600 hover:text-pink-900 font-medium">Tu préfères ?</a>
-                        <a href="{{ route('scoreboard.index') }}" class="text-yellow-600 hover:text-yellow-900 font-medium">🏆 Scores</a>
-                        <a href="{{ route('profile.show') }}" class="text-blue-600 hover:text-blue-900 font-medium">Mon Profil</a>
-                        @if(auth()->user()->hasRole('admin'))
-                            <a href="{{ route('admin.users') }}" class="text-purple-600 hover:text-purple-900 font-medium">Admin</a>
-                            <a href="{{ route('admin.quizzes.index') }}" class="text-orange-600 hover:text-orange-900 font-medium">Gérer Quiz</a>
-                            <a href="{{ route('admin.preference.index') }}" class="text-pink-600 hover:text-pink-900 font-medium">Gérer Préférences</a>
-                            <a href="{{ route('admin.scoreboard.index') }}" class="text-teal-600 hover:text-teal-900 font-medium">Gérer Scores</a>
-                        @endif
-                        <form action="{{ route('logout') }}" method="POST" class="inline">
-                            @csrf
-                            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
-                                Déconnexion
-                            </button>
-                        </form>
-                    @endauth
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="@yield('body-class', 'bg-gray-50')">
+    @include('layouts.partials.nav')
 
     <main>
         @yield('content')
@@ -45,8 +16,9 @@
 
     <footer class="bg-gray-800 text-white py-8 mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p>&copy; 2026 Quiz App. Tous droits réservés.</p>
+            <p>&copy; {{ date('Y') }} {{ config('app.name', 'Télé Lili') }}. Tous droits réservés.</p>
         </div>
     </footer>
+    @stack('scripts')
 </body>
 </html>

@@ -34,16 +34,32 @@
                 <form action="{{ route('admin.scoreboard.store') }}" method="POST" class="space-y-4">
                     @csrf
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Joueur</label>
-                        <select name="user_id" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="">-- Choisir un joueur --</option>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Joueur(s)
+                            <span class="text-gray-400 font-normal">(plusieurs possibles)</span>
+                        </label>
+
+                        {{-- Select all / deselect all --}}
+                        <div class="flex gap-2 mb-2">
+                            <button type="button" onclick="toggleAllPlayers(true)"
+                                class="text-xs text-blue-600 hover:underline">Tout sélectionner</button>
+                            <span class="text-gray-300">|</span>
+                            <button type="button" onclick="toggleAllPlayers(false)"
+                                class="text-xs text-gray-500 hover:underline">Tout désélectionner</button>
+                        </div>
+
+                        <div id="player-list" class="border border-gray-300 rounded-lg max-h-48 overflow-y-auto divide-y divide-gray-100">
                             @foreach($users as $user)
-                                <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
-                                    {{ $user->nickname ?: $user->name }}
-                                </option>
+                            <label class="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="user_ids[]" value="{{ $user->id }}"
+                                    class="player-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    {{ is_array(old('user_ids')) && in_array($user->id, old('user_ids')) ? 'checked' : '' }}>
+                                <span class="text-sm text-gray-800">{{ $user->nickname ?: $user->name }}</span>
+                            </label>
                             @endforeach
-                        </select>
-                        @error('user_id')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                        </div>
+                        @error('user_ids')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                        @error('user_ids.*')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
 
                     <div>
@@ -63,6 +79,13 @@
                             @endforeach
                         </select>
                         @error('category')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Origine <span class="text-gray-400 font-normal">(optionnelle)</span></label>
+                        <input type="text" name="origin" value="{{ old('origin') }}" placeholder="Ex: Jeu du chapeau, Quiz, Défi..."
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        @error('origin')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
 
                     <div>
@@ -119,6 +142,7 @@
                                     <th class="py-3 px-4 text-left">Joueur</th>
                                     <th class="py-3 px-4 text-left">Points</th>
                                     <th class="py-3 px-4 text-left">Catégorie</th>
+                                    <th class="py-3 px-4 text-left">Origine</th>
                                     <th class="py-3 px-4 text-left">Note</th>
                                     <th class="py-3 px-4 text-left">Par</th>
                                     <th class="py-3 px-4 text-left">Date</th>
@@ -142,6 +166,7 @@
                                             {{ $entry->category }}
                                         </span>
                                     </td>
+                                    <td class="py-3 px-4 text-gray-500">{{ $entry->origin ?: '—' }}</td>
                                     <td class="py-3 px-4 text-gray-500">{{ $entry->note ?: '—' }}</td>
                                     <td class="py-3 px-4 text-gray-500">
                                         {{ $entry->awardedBy ? ($entry->awardedBy->nickname ?: $entry->awardedBy->name) : 'Auto' }}
@@ -170,4 +195,11 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script>
+function toggleAllPlayers(check) {
+    document.querySelectorAll('.player-checkbox').forEach(cb => cb.checked = check);
+}
+</script>
+@endpush
 @endsection

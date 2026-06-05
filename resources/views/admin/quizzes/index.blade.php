@@ -47,8 +47,12 @@
                                     {{ ucfirst($quiz->status) }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                @if($quiz->isActive()) id="response-count-{{ $quiz->id }}" @endif>
                                 {{ $quiz->responses->count() }}
+                                @if($quiz->isActive())
+                                    <span class="ml-1 inline-block w-2 h-2 rounded-full bg-green-400 animate-pulse" title="En direct"></span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                                 @if ($quiz->isDraft())
@@ -96,3 +100,26 @@
     </div>
 </div>
 @endsection
+
+@php $activeQuiz = $quizzes->firstWhere('status', 'active'); @endphp
+@if($activeQuiz)
+@push('scripts')
+<script>
+(function () {
+    const quizId = {{ $activeQuiz->id }};
+    const el = document.getElementById('response-count-' + quizId);
+    if (!el) return;
+    setInterval(async () => {
+        try {
+            const res = await fetch('/admin/quizzes/' + quizId + '/live-count');
+            if (!res.ok) return;
+            const data = await res.json();
+            const dot = el.querySelector('span');
+            el.textContent = data.count + ' ';
+            if (dot) el.appendChild(dot);
+        } catch (e) {}
+    }, 3000);
+})();
+</script>
+@endpush
+@endif

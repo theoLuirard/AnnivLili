@@ -35,9 +35,9 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
+                    <label for="email" class="block text-gray-700 font-bold mb-2">Identifiant</label>
                     <input 
-                        type="email" 
+                        type="text" 
                         id="email" 
                         name="email" 
                         value="{{ old('email') }}" 
