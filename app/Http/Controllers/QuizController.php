@@ -114,13 +114,16 @@ class QuizController extends Controller
             ->where('user_id', $userId)
             ->first();
 
+        $correct = (float) $quiz->correct_answer;
         $allResponses = QuizResponse::where('quiz_id', $quiz->id)
             ->with('user')
             ->get()
-            ->sortBy([
-                fn($r) => abs((float) $r->numeric_answer - (float) $quiz->correct_answer),
-                fn($r) => $r->created_at->timestamp,
-            ])
+            ->sort(function ($a, $b) use ($correct) {
+                $diffA = abs((float) $a->numeric_answer - $correct);
+                $diffB = abs((float) $b->numeric_answer - $correct);
+                if ($diffA !== $diffB) return $diffA <=> $diffB;
+                return $a->created_at->timestamp <=> $b->created_at->timestamp;
+            })
             ->values();
 
         $leaderboard = $allResponses->map(function ($r, $index) use ($quiz, $userId) {
@@ -190,8 +193,7 @@ class QuizController extends Controller
                 ->with('error', 'Vous avez déjà répondu à cette question');
         }
 
-        // Create response
-        $response = QuizResponse::create([
+        QuizResponse::create([
             'quiz_id' => $activeQuiz->id,
             'user_id' => Auth::id(),
             'numeric_answer' => $validated['numeric_answer'],

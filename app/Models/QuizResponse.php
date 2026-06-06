@@ -41,12 +41,13 @@ class QuizResponse extends Model
             $allResponses = QuizResponse::where('quiz_id', $this->quiz_id)->get();
         }
 
-        // Rank by proximity, speed (created_at) as tiebreaker
-        // values() resets keys to positional indexes so search() returns the rank position
-        $sorted = $allResponses->sortBy([
-            fn($r) => abs((float) $r->numeric_answer - $correct),
-            fn($r) => $r->created_at->timestamp,
-        ])->values();
+        // Rank by proximity (float), speed (created_at) as tiebreaker
+        $sorted = $allResponses->sort(function ($a, $b) use ($correct) {
+            $diffA = abs((float) $a->numeric_answer - $correct);
+            $diffB = abs((float) $b->numeric_answer - $correct);
+            if ($diffA !== $diffB) return $diffA <=> $diffB;
+            return $a->created_at->timestamp <=> $b->created_at->timestamp;
+        })->values();
         $rank = $sorted->search(fn($r) => $r->id === $this->id);
 
         $exactBonus = ((float) $this->numeric_answer === $correct) ? 3 : 0;
