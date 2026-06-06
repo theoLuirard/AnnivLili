@@ -233,6 +233,7 @@ let lastQuestionId = null;
 let lastQuestionStatus = null;
 let lastGameStatus = null;
 let lastHasAnswered = false;
+let lastIsEliminated = false;
 let hasAnswered = false;
 
 const csrfToken = '{{ csrf_token() }}';
@@ -548,9 +549,10 @@ async function poll() {
     }
 
     const qs = state.question_status;
-    const questionChanged = state.question_id !== lastQuestionId;
-    const statusChanged   = qs !== lastQuestionStatus;
-    const answeredChanged = state.has_answered !== lastHasAnswered;
+    const questionChanged    = state.question_id !== lastQuestionId;
+    const statusChanged      = qs !== lastQuestionStatus;
+    const answeredChanged    = state.has_answered !== lastHasAnswered;
+    const eliminationChanged = (state.is_eliminated || false) !== lastIsEliminated;
 
     // Detect new question → reset hasAnswered
     if (questionChanged && state.question_id) {
@@ -561,19 +563,19 @@ async function poll() {
     if (state.has_answered) hasAnswered = true;
 
     if (!qs || qs === 'waiting') {
-        if (statusChanged || questionChanged) {
+        if (statusChanged || questionChanged || eliminationChanged) {
             content.innerHTML = renderGameWaiting(state);
         }
     } else if (qs === 'active') {
-        if (questionChanged || statusChanged || answeredChanged) {
+        if (questionChanged || statusChanged || answeredChanged || eliminationChanged) {
             content.innerHTML = renderQuestion(state);
         }
     } else if (qs === 'revealing') {
-        if (questionChanged || statusChanged) {
+        if (questionChanged || statusChanged || eliminationChanged) {
             content.innerHTML = renderRevealing(state);
         }
     } else {
-        if (statusChanged || questionChanged) {
+        if (statusChanged || questionChanged || eliminationChanged) {
             content.innerHTML = renderGameWaiting(state);
         }
     }
@@ -589,6 +591,7 @@ async function poll() {
     lastQuestionStatus = qs;
     lastGameStatus = state.status;
     lastHasAnswered = state.has_answered || false;
+    lastIsEliminated = state.is_eliminated || false;
 }
 
 // Initial render then start polling
