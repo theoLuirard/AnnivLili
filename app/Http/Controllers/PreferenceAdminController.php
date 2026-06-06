@@ -122,19 +122,18 @@ class PreferenceAdminController extends Controller
                 $answer->update(['is_correct' => $isCorrect]);
             }
 
-            // Calculate points
+            // Points = number of people who answered wrong
+            $points = count($wrongAnswerers);
+
+            foreach ($answers as $answer) {
+                if ($answer->is_correct) {
+                    $answer->update(['points_earned' => $points]);
+                }
+            }
+
             if ($question->is_eliminatory) {
                 // Mark the game as in eliminatory phase
                 $game->update(['is_eliminatory_phase' => true]);
-
-                // Points = number of people who failed
-                $points = count($wrongAnswerers);
-
-                foreach ($answers as $answer) {
-                    if ($answer->is_correct) {
-                        $answer->update(['points_earned' => $points]);
-                    }
-                }
 
                 // Eliminate wrong answerers (only if not already eliminated)
                 foreach ($wrongAnswerers as $userId) {
@@ -144,13 +143,6 @@ class PreferenceAdminController extends Controller
                     ], [
                         'question_id' => $question->id,
                     ]);
-                }
-            } else {
-                // Normal question: 1 point for correct answer
-                foreach ($answers as $answer) {
-                    if ($answer->is_correct) {
-                        $answer->update(['points_earned' => 1]);
-                    }
                 }
             }
         });
