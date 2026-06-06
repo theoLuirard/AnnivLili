@@ -48,10 +48,12 @@ class QuizResponse extends Model
         ]);
         $rank = $sorted->search(fn($r) => $r->id === $this->id);
 
-        if ($rank === 0) return 10; // 1st
-        if ($rank === 1) return 5;  // 2nd
-        if ($rank === 2) return 2;  // 3rd
+        $exactBonus = ((float) $this->numeric_answer === $correct) ? 3 : 0;
 
-        return 0;
+        if ($rank === 0) return 4 + $exactBonus;
+        if ($rank === 1) return 2 + $exactBonus;
+        if ($rank === 2) return 1 + $exactBonus;
+
+        return $exactBonus;
     }
 }
