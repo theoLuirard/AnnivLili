@@ -365,7 +365,10 @@ function renderRevealing(state) {
         const optLabel = a.answer === 'a' ? state.option_a : state.option_b;
         return `<div class="flex items-center justify-between ${bgColor} rounded-lg px-4 py-2">
             <div class="flex items-center gap-2">
-                <span class="font-bold w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs">${a.initials}</span>
+                ${a.avatar
+                    ? `<img src="${a.avatar}" class="w-7 h-7 rounded-full object-cover shrink-0" />`
+                    : `<span class="font-bold w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs shrink-0">${a.initials}</span>`
+                }
                 <span class="${textColor} font-medium">${a.name}</span>
                 ${meTag}
             </div>
@@ -401,7 +404,10 @@ function renderLeaderboard(leaderboard) {
         return `<div class="flex items-center justify-between px-5 py-3 border-b border-gray-100 last:border-0">
             <div class="flex items-center gap-3">
                 <span class="text-xl">${medal}</span>
-                <span class="font-bold w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 text-white flex items-center justify-center text-xs">${p.initials}</span>
+                ${p.avatar
+                    ? `<img src="${p.avatar}" class="w-8 h-8 rounded-full object-cover shrink-0" />`
+                    : `<span class="font-bold w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 text-white flex items-center justify-center text-xs shrink-0">${p.initials}</span>`
+                }
                 <span class="font-medium text-gray-800">${p.name}</span>
             </div>
             <span class="font-bold text-purple-700 text-lg">${p.points} pts</span>
@@ -458,7 +464,10 @@ function renderPodium(state) {
                 <div class="podium-medal">${p.medal}</div>
                 <div class="podium-avatar ${p.avatarClass}">
                     ${crown}
-                    ${p.initials}
+                    ${p.avatar
+                        ? `<img src="${p.avatar}" class="w-full h-full rounded-full object-cover" />`
+                        : p.initials
+                    }
                 </div>
                 <div class="podium-name">${p.name}</div>
                 <div class="podium-points">${p.points} pts</div>
@@ -473,7 +482,10 @@ function renderPodium(state) {
                 <div class="podium-other-row">
                     <div style="display:flex;align-items:center;gap:0.6rem;">
                         <span style="color:rgba(255,255,255,0.6);font-size:0.8rem;font-weight:700;width:1.5rem;">#${i+4}</span>
-                        <span style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.7rem;color:white;">${p.initials}</span>
+                        ${p.avatar
+                            ? `<img src="${p.avatar}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;" />`
+                            : `<span style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.7rem;color:white;flex-shrink:0;">${p.initials}</span>`
+                        }
                         <span style="color:white;font-weight:600;font-size:0.85rem;">${p.name}</span>
                     </div>
                     <span style="color:#c084fc;font-weight:700;">${p.points} pts</span>

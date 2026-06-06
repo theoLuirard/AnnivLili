@@ -42,9 +42,13 @@
                         </td>
                         <td class="py-3 px-5">
                             <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-700">
-                                    {{ mb_strtoupper(mb_substr($entry->user->nickname ?: $entry->user->name, 0, 2)) }}
-                                </div>
+                                @if($entry->user->profile_picture)
+                                    <img src="{{ asset('storage/' . $entry->user->profile_picture) }}" class="w-8 h-8 rounded-full object-cover shrink-0" />
+                                @else
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-700 shrink-0">
+                                        {{ mb_strtoupper(mb_substr($entry->user->nickname ?: $entry->user->name, 0, 2)) }}
+                                    </div>
+                                @endif
                                 <span class="font-medium text-gray-800">
                                     {{ $entry->user->nickname ?: $entry->user->name }}
                                     @if(auth()->id() == $entry->user_id)

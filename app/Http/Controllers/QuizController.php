@@ -38,6 +38,7 @@ class QuizController extends Controller
                     'rank'        => $i + 1,
                     'name'        => $s->user->name,
                     'initials'    => $s->user->initials,
+                    'avatar'      => $s->user->avatar_url,
                     'total_score' => $s->total_score,
                 ])->values()->all(),
             ];
@@ -72,6 +73,7 @@ class QuizController extends Controller
                     'rank'        => $i + 1,
                     'name'        => $s->user->name,
                     'initials'    => $s->user->initials,
+                    'avatar'      => $s->user->avatar_url,
                     'total_score' => $s->total_score,
                 ])->values()->all(),
             ]);

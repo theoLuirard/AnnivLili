@@ -195,9 +195,13 @@
                     <div class="space-y-2">
                         @foreach($game->eliminations as $elim)
                             <div class="flex items-center gap-2 text-sm text-red-700">
-                                <span class="w-7 h-7 rounded-full bg-red-200 flex items-center justify-center font-bold text-xs">
-                                    {{ strtoupper(substr($elim->user->name, 0, 2)) }}
-                                </span>
+                                @if($elim->user->profile_picture)
+                                    <img src="{{ asset('storage/' . $elim->user->profile_picture) }}" class="w-7 h-7 rounded-full object-cover shrink-0" />
+                                @else
+                                    <span class="w-7 h-7 rounded-full bg-red-200 flex items-center justify-center font-bold text-xs shrink-0">
+                                        {{ strtoupper(substr($elim->user->name, 0, 2)) }}
+                                    </span>
+                                @endif
                                 {{ $elim->user->name }}
                             </div>
                         @endforeach
@@ -214,9 +218,13 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <span>{{ $i === 0 ? '🥇' : ($i === 1 ? '🥈' : ($i === 2 ? '🥉' : '#'.($i+1))) }}</span>
-                                    <span class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 text-white flex items-center justify-center text-xs font-bold">
-                                        {{ $entry['initials'] }}
-                                    </span>
+                                    @if($entry['avatar'])
+                                        <img src="{{ $entry['avatar'] }}" class="w-8 h-8 rounded-full object-cover shrink-0" />
+                                    @else
+                                        <span class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                                            {{ $entry['initials'] }}
+                                        </span>
+                                    @endif
                                     <span class="text-sm font-medium text-gray-800">{{ $entry['name'] }}</span>
                                 </div>
                                 <span class="font-bold text-purple-700">{{ $entry['points'] }} pts</span>
