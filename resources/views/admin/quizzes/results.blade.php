@@ -39,7 +39,7 @@
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="bg-white shadow rounded-lg overflow-x-auto">
             <div class="px-6 py-4 border-b border-gray-200">
                 <h2 class="text-xl font-semibold text-gray-900">Classement</h2>
             </div>

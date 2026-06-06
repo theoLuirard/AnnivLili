@@ -17,7 +17,7 @@
             <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">{{ $message }}</div>
         @endif
 
-        <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="bg-white shadow rounded-lg overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-100">
                     <tr>

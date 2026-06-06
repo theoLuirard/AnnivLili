@@ -22,8 +22,8 @@
             Aucune attribution de points pour le moment.
         </div>
     @else
-        <div class="bg-white rounded-xl shadow overflow-hidden">
-            <table class="w-full">
+        <div class="bg-white rounded-xl shadow overflow-x-auto">
+            <table class="w-full min-w-max">
                 <thead class="bg-gray-100 text-gray-600 text-sm uppercase">
                     <tr>
                         <th class="py-3 px-5 text-left">Date</th>
