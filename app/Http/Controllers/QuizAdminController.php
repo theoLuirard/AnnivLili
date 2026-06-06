@@ -7,6 +7,7 @@ use App\Models\QuizResponse;
 use App\Models\ScoreboardEntry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class QuizAdminController extends Controller
 {
@@ -105,10 +106,9 @@ class QuizAdminController extends Controller
 
     public function reset(NumericQuiz $quiz)
     {
-        // Validation: Only allow reset if quiz is 'closed'
-        if ($quiz->status !== 'closed') {
+        if ($quiz->isDraft()) {
             return redirect()->route('admin.quizzes.index')
-                ->with('error', 'Only closed quizzes can be reset');
+                ->with('error', 'Ce quiz est déjà en brouillon.');
         }
 
         // Get user IDs before deleting responses
@@ -119,16 +119,37 @@ class QuizAdminController extends Controller
         // Delete all responses for this quiz
         QuizResponse::where('quiz_id', $quiz->id)->delete();
 
-        // Update quiz status back to 'draft'
+        // Remove scoreboard participation points awarded when the quiz was closed
+        ScoreboardEntry::where('category', 'Auto')
+            ->where('note', 'Participation au quiz #' . $quiz->id)
+            ->delete();
+
+        // Reset quiz status back to 'draft'
         $quiz->update(['status' => 'draft']);
 
-        // Reset scores for users who had responses on this quiz
+        // Recalculate quiz scores for affected users
         foreach ($userIds as $userId) {
             \App\Models\QuizScore::updateScore($userId);
         }
 
         return redirect()->route('admin.quizzes.index')
-            ->with('success', 'Quiz réinitialisé');
+            ->with('success', 'Quiz réinitialisé avec succès.');
+    }
+
+    public function showFinale()
+    {
+        Cache::forever('quiz_finale_active', true);
+
+        return redirect()->route('admin.quizzes.index')
+            ->with('success', '🏆 Podium final activé ! Tous les joueurs voient maintenant le podium.');
+    }
+
+    public function hideFinale()
+    {
+        Cache::forget('quiz_finale_active');
+
+        return redirect()->route('admin.quizzes.index')
+            ->with('success', 'Podium final désactivé.');
     }
 
     public function destroy(NumericQuiz $quiz)
@@ -149,6 +170,13 @@ class QuizAdminController extends Controller
         $leaderboard = $responses->sortByDesc('score');
 
         return view('admin.quizzes.results', compact('quiz', 'responses', 'leaderboard'));
+    }
+
+    public function liveCount(NumericQuiz $quiz)
+    {
+        return response()->json([
+            'count' => QuizResponse::where('quiz_id', $quiz->id)->count(),
+        ]);
     }
 
     public function downloadResults(NumericQuiz $quiz)

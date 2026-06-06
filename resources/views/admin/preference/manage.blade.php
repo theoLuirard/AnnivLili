@@ -33,6 +33,13 @@
                     <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">■ Terminer le jeu</button>
                 </form>
             @endif
+            @if($game->show_podium)
+                <form action="{{ route('admin.preference.dismiss-podium', $game->id) }}" method="POST"
+                      onsubmit="return confirm('Masquer le podium pour les joueurs ?')">
+                    @csrf
+                    <button class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">🏆 Masquer le podium</button>
+                </form>
+            @endif
             @if($game->is_eliminatory_phase)
                 <form action="{{ route('admin.preference.end-eliminatory', $game->id) }}" method="POST"
                       onsubmit="return confirm('Mettre fin à la phase éliminatoire ? Tous les joueurs éliminés reviendront.')">
@@ -101,7 +108,11 @@
 
                         {{-- Answers count --}}
                         <p class="text-sm text-gray-500 mb-4">
-                            {{ $question->answers->count() }} réponse(s)
+                            <span @if($question->isActive()) id="answer-count-{{ $question->id }}" @endif>{{ $question->answers->count() }}</span>
+                            réponse(s)
+                            @if($question->isActive())
+                                <span class="ml-1 inline-block w-2 h-2 rounded-full bg-green-400 animate-pulse align-middle" title="En direct"></span>
+                            @endif
                             @if($question->correct_answer)
                                 — ✅ {{ $question->answers->where('is_correct', true)->count() }} correct(s)
                                 / ❌ {{ $question->answers->where('is_correct', false)->count() }} faux
@@ -222,3 +233,26 @@
 </div>
 </div>
 @endsection
+
+@php $activeQuestion = $game->questions->firstWhere('status', 'active'); @endphp
+@if($game->isActive() && $activeQuestion)
+@push('scripts')
+<script>
+(function () {
+    const gameId = {{ $game->id }};
+    let trackedQuestionId = {{ $activeQuestion->id }};
+
+    setInterval(async () => {
+        try {
+            const res = await fetch('/admin/preference/' + gameId + '/live-count');
+            if (!res.ok) return;
+            const data = await res.json();
+            if (!data.question_id) return;
+            const el = document.getElementById('answer-count-' + data.question_id);
+            if (el) el.textContent = data.count;
+        } catch (e) {}
+    }, 3000);
+})();
+</script>
+@endpush
+@endif

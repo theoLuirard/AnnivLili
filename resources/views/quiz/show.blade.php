@@ -439,30 +439,26 @@
 
     {{-- ──────────────────────────────────────────────────────────── --}}
     {{-- Podium Overlay (global leaderboard end screen)              --}}
+    {{-- Always in DOM; shown dynamically via JS or on page load     --}}
     {{-- ──────────────────────────────────────────────────────────── --}}
-    @if ($showPodium)
-        <div id="podium-overlay">
-            <div class="stars"></div>
-            <div class="confetti-container" id="confetti-container"></div>
+    <div id="podium-overlay" class="hidden">
+        <div class="stars"></div>
+        <div class="confetti-container" id="confetti-container"></div>
 
-            <div class="relative z-10 flex flex-col items-center gap-8 px-4">
-                <div class="podium-title text-center">
-                    <p class="text-yellow-300 text-lg font-semibold tracking-widest uppercase mb-1">🎉 Quiz Terminé !</p>
-                    <h1 class="text-5xl font-black text-white" style="text-shadow: 0 0 30px rgba(251,191,36,0.5);">
-                        🏆 Podium Final
-                    </h1>
-                </div>
+        <div class="relative z-10 flex flex-col items-center gap-8 px-4">
+            <div class="podium-title text-center">
+                <p class="text-yellow-300 text-lg font-semibold tracking-widest uppercase mb-1">🎉 Quiz Terminé !</p>
+                <h1 class="text-5xl font-black text-white" style="text-shadow: 0 0 30px rgba(251,191,36,0.5);">
+                    🏆 Podium Final
+                </h1>
+            </div>
 
                 <div class="podium-stage">
                     <div class="podium-block podium-2nd" id="block-2nd">
                         <div class="podium-player" id="player-2nd">
                             @if ($topWinners->count() >= 2)
                                 <div class="podium-medal">🥈</div>
-                                @if ($topWinners[1]->user->profile_picture)
-                                    <img src="{{ asset('storage/' . $topWinners[1]->user->profile_picture) }}" class="podium-avatar" style="object-fit:cover;" />
-                                @else
-                                    <div class="podium-avatar">{{ $topWinners[1]->user->initials }}</div>
-                                @endif
+                                <div class="podium-avatar">{{ $topWinners[1]->user->initials }}</div>
                                 <div class="podium-name">{{ $topWinners[1]->user->name }}</div>
                                 <div class="podium-score-badge">{{ $topWinners[1]->total_score }} pts</div>
                             @endif
@@ -474,11 +470,7 @@
                         <div class="podium-player" id="player-1st">
                             @if ($topWinners->count() >= 1)
                                 <div class="podium-medal">🥇</div>
-                                @if ($topWinners[0]->user->profile_picture)
-                                    <img src="{{ asset('storage/' . $topWinners[0]->user->profile_picture) }}" class="podium-avatar" style="object-fit:cover;" />
-                                @else
-                                    <div class="podium-avatar">{{ $topWinners[0]->user->initials }}</div>
-                                @endif
+                                <div class="podium-avatar">{{ $topWinners[0]->user->initials }}</div>
                                 <div class="podium-name">{{ $topWinners[0]->user->name }}</div>
                                 <div class="podium-score-badge">{{ $topWinners[0]->total_score }} pts</div>
                             @endif
@@ -490,11 +482,7 @@
                         <div class="podium-player" id="player-3rd">
                             @if ($topWinners->count() >= 3)
                                 <div class="podium-medal">🥉</div>
-                                @if ($topWinners[2]->user->profile_picture)
-                                    <img src="{{ asset('storage/' . $topWinners[2]->user->profile_picture) }}" class="podium-avatar" style="object-fit:cover;" />
-                                @else
-                                    <div class="podium-avatar">{{ $topWinners[2]->user->initials }}</div>
-                                @endif
+                                <div class="podium-avatar">{{ $topWinners[2]->user->initials }}</div>
                                 <div class="podium-name">{{ $topWinners[2]->user->name }}</div>
                                 <div class="podium-score-badge">{{ $topWinners[2]->total_score }} pts</div>
                             @endif
@@ -503,60 +491,18 @@
                     </div>
                 </div>
 
-                <button id="podium-close-btn" onclick="document.getElementById('podium-overlay').classList.add('hidden')"
-                    class="mt-2 px-8 py-3 bg-white text-purple-900 font-bold text-lg rounded-full shadow-lg hover:bg-yellow-300 hover:text-purple-900 transition-all duration-300 hover:scale-105">
+            <div class="flex flex-col sm:flex-row gap-3 mt-2">
+                <a href="{{ route('scoreboard.index') }}"
+                    class="px-8 py-3 bg-white text-purple-900 font-bold text-lg rounded-full shadow-lg hover:bg-yellow-300 hover:text-purple-900 transition-all duration-300 hover:scale-105 text-center">
                     Voir le classement complet →
-                </button>
+                </a>
+                <a href="{{ route('dashboard') }}"
+                    class="px-8 py-3 bg-purple-700 border-2 border-white text-white font-bold text-lg rounded-full shadow-lg hover:bg-purple-500 transition-all duration-300 hover:scale-105 text-center">
+                    ← Retour au menu
+                </a>
             </div>
         </div>
-
-        <script>
-            (function() {
-                const CONFETTI_COLORS = ['#fbbf24', '#f59e0b', '#a78bfa', '#60a5fa', '#34d399', '#f472b6', '#fff',
-                    '#fb923c'
-                ];
-
-                function createConfetti() {
-                    const container = document.getElementById('confetti-container');
-                    for (let i = 0; i < 120; i++) {
-                        const el = document.createElement('div');
-                        el.className = 'confetti-piece';
-                        const color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
-                        el.style.cssText =
-                            `left:${Math.random()*100}%;width:${6+Math.random()*8}px;height:${(6+Math.random()*8)*1.4}px;background:${color};border-radius:${Math.random()>.5?'50%':'0%'};animation-duration:${2.5+Math.random()*3}s;animation-delay:${Math.random()*4}s;`;
-                        container.appendChild(el);
-                    }
-                }
-
-                function sequenceAnimation() {
-                    setTimeout(() => {
-                        document.getElementById('block-1st').classList.add('rise');
-                    }, 400);
-                    setTimeout(() => {
-                        document.getElementById('player-1st').classList.add('show');
-                    }, 900);
-                    setTimeout(() => {
-                        document.getElementById('block-2nd').classList.add('rise');
-                    }, 800);
-                    setTimeout(() => {
-                        document.getElementById('player-2nd').classList.add('show');
-                    }, 1300);
-                    setTimeout(() => {
-                        document.getElementById('block-3rd').classList.add('rise');
-                    }, 1100);
-                    setTimeout(() => {
-                        document.getElementById('player-3rd').classList.add('show');
-                    }, 1600);
-                    setTimeout(createConfetti, 500);
-                }
-                if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', sequenceAnimation);
-                } else {
-                    sequenceAnimation();
-                }
-            })();
-        </script>
-    @endif
+    </div>
 
     {{-- ──────────────────────────────────────────────────────────── --}}
     {{-- Main Quiz Page                                               --}}
@@ -813,6 +759,52 @@
                 showPhase('phase-waiting', 4500);
             }
 
+            // ── Podium overlay (finale) ────────────────────────────────
+            let podiumShown = false;
+            const PODIUM_CONFETTI_COLORS = ['#fbbf24', '#f59e0b', '#a78bfa', '#60a5fa', '#34d399', '#f472b6', '#fff', '#fb923c'];
+
+            function fillPlayerBlock(containerId, winner, medal) {
+                const el = document.getElementById(containerId);
+                if (!el || !winner) return;
+                el.innerHTML = `
+                    <div class="podium-medal">${medal}</div>
+                    <div class="podium-avatar">${winner.initials}</div>
+                    <div class="podium-name">${winner.name}</div>
+                    <div class="podium-score-badge">${winner.total_score} pts</div>`;
+            }
+
+            function showPodiumOverlay(winners) {
+                if (podiumShown) return;
+                podiumShown = true;
+
+                if (winners && winners.length >= 1) fillPlayerBlock('player-1st', winners[0], '🥇');
+                if (winners && winners.length >= 2) fillPlayerBlock('player-2nd', winners[1], '🥈');
+                if (winners && winners.length >= 3) fillPlayerBlock('player-3rd', winners[2], '🥉');
+
+                const overlay = document.getElementById('podium-overlay');
+                if (overlay) overlay.classList.remove('hidden');
+
+                function createPodiumConfetti() {
+                    const container = document.getElementById('confetti-container');
+                    if (!container) return;
+                    for (let i = 0; i < 120; i++) {
+                        const el = document.createElement('div');
+                        el.className = 'confetti-piece';
+                        const color = PODIUM_CONFETTI_COLORS[Math.floor(Math.random() * PODIUM_CONFETTI_COLORS.length)];
+                        el.style.cssText = `left:${Math.random()*100}%;width:${6+Math.random()*8}px;height:${(6+Math.random()*8)*1.4}px;background:${color};border-radius:${Math.random()>.5?'50%':'0%'};animation-duration:${2.5+Math.random()*3}s;animation-delay:${Math.random()*4}s;`;
+                        container.appendChild(el);
+                    }
+                }
+
+                setTimeout(() => document.getElementById('block-1st')?.classList.add('rise'), 400);
+                setTimeout(() => document.getElementById('player-1st')?.classList.add('show'), 900);
+                setTimeout(() => document.getElementById('block-2nd')?.classList.add('rise'), 800);
+                setTimeout(() => document.getElementById('player-2nd')?.classList.add('show'), 1300);
+                setTimeout(() => document.getElementById('block-3rd')?.classList.add('rise'), 1100);
+                setTimeout(() => document.getElementById('player-3rd')?.classList.add('show'), 1600);
+                setTimeout(createPodiumConfetti, 500);
+            }
+
             // ── Polling ────────────────────────────────────────────────
             let pollTimer = null;
 
@@ -827,7 +819,10 @@
                     if (!res.ok) return;
                     const data = await res.json();
 
-                    if (data.status === 'closed' && data.quiz_id !== resultsShownForQuizId) {
+                    if (data.status === 'finale') {
+                        showPodiumOverlay(data.top_winners);
+                        return; // Finale is the terminal state — stop polling
+                    } else if (data.status === 'closed' && data.quiz_id !== resultsShownForQuizId) {
                         revealResults(data);
                     } else if (data.status === 'active') {
                         // If a new active quiz appeared (different from what we know), reload
@@ -850,546 +845,16 @@
 
             // ── Init ───────────────────────────────────────────────────
             document.addEventListener('DOMContentLoaded', function() {
-                // Show overlay immediately on page load if already closed
                 if (currentState.status === 'closed') {
                     revealResults(currentState);
+                } else if (currentState.status === 'finale') {
+                    showPodiumOverlay(currentState.top_winners);
+                    return; // No need to poll — finale is already shown
                 }
 
-                // Always poll to detect state changes
+                // Poll to detect state changes
                 pollTimer = setTimeout(poll, 2500);
             });
         })();
     </script>
-@endsection
-
-@push('styles')
-<style>
-    /* Confetti */
-    .confetti-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 999;
-        overflow: hidden;
-    }
-
-    .confetti-piece {
-        position: absolute;
-        width: 10px;
-        height: 14px;
-        top: -20px;
-        opacity: 0;
-        animation: confettiFall linear forwards;
-    }
-
-    @keyframes confettiFall {
-        0% {
-            transform: translateY(0) rotate(0deg);
-            opacity: 1;
-        }
-
-        80% {
-            opacity: 1;
-        }
-
-        100% {
-            transform: translateY(110vh) rotate(720deg);
-            opacity: 0;
-        }
-    }
-
-    /* Podium overlay */
-    #podium-overlay {
-        position: fixed;
-        inset: 0;
-        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4c1d95 100%);
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-    }
-
-    #podium-overlay.hidden {
-        display: none;
-    }
-
-    /* Stars background */
-    .stars {
-        position: absolute;
-        inset: 0;
-        background-image:
-            radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.6) 0%, transparent 100%),
-            radial-gradient(1px 1px at 80% 10%, rgba(255, 255, 255, 0.5) 0%, transparent 100%),
-            radial-gradient(1px 1px at 50% 60%, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
-            radial-gradient(1px 1px at 10% 70%, rgba(255, 255, 255, 0.6) 0%, transparent 100%),
-            radial-gradient(1px 1px at 90% 80%, rgba(255, 255, 255, 0.5) 0%, transparent 100%),
-            radial-gradient(1px 1px at 35% 15%, rgba(255, 255, 255, 0.7) 0%, transparent 100%),
-            radial-gradient(1px 1px at 65% 45%, rgba(255, 255, 255, 0.6) 0%, transparent 100%),
-            radial-gradient(1.5px 1.5px at 75% 25%, rgba(255, 255, 255, 0.8) 0%, transparent 100%),
-            radial-gradient(1.5px 1.5px at 25% 85%, rgba(255, 255, 255, 0.7) 0%, transparent 100%);
-        pointer-events: none;
-    }
-
-    /* Title animation */
-    .podium-title {
-        animation: titleDrop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
-    }
-
-    @keyframes titleDrop {
-        from {
-            transform: translateY(-80px) scale(0.5);
-            opacity: 0;
-        }
-
-        to {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-        }
-    }
-
-    /* Podium bars */
-    .podium-stage {
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        gap: 8px;
-        height: 260px;
-        position: relative;
-    }
-
-    .podium-block {
-        width: 120px;
-        border-radius: 12px 12px 0 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-end;
-        padding-bottom: 12px;
-        transform: translateY(100%);
-        opacity: 0;
-        transition: transform 0.9s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.6s ease;
-        position: relative;
-        overflow: visible;
-    }
-
-    .podium-block.rise {
-        transform: translateY(0);
-        opacity: 1;
-    }
-
-    .podium-1st {
-        height: 220px;
-        background: linear-gradient(180deg, #f59e0b, #d97706);
-        order: 2;
-        transition-delay: 0.2s;
-    }
-
-    .podium-2nd {
-        height: 160px;
-        background: linear-gradient(180deg, #9ca3af, #6b7280);
-        order: 1;
-        transition-delay: 0.6s;
-    }
-
-    .podium-3rd {
-        height: 120px;
-        background: linear-gradient(180deg, #cd7c3a, #92400e);
-        order: 3;
-        transition-delay: 0.9s;
-    }
-
-    /* Avatar on top of block */
-    .podium-player {
-        position: absolute;
-        top: -90px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-
-    .podium-player.show {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    .podium-avatar {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: white;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        border: 3px solid white;
-    }
-
-    .podium-1st .podium-avatar {
-        background: linear-gradient(135deg, #fbbf24, #f59e0b);
-        animation: pulse-winner 1.5s ease-in-out infinite 1.5s;
-    }
-
-    .podium-2nd .podium-avatar {
-        background: linear-gradient(135deg, #d1d5db, #9ca3af);
-    }
-
-    .podium-3rd .podium-avatar {
-        background: linear-gradient(135deg, #d97706, #92400e);
-    }
-
-    @keyframes pulse-winner {
-
-        0%,
-        100% {
-            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
-            transform: scale(1);
-        }
-
-        50% {
-            box-shadow: 0 4px 30px rgba(251, 191, 36, 0.8);
-            transform: scale(1.08);
-        }
-    }
-
-    .podium-name {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: white;
-        text-align: center;
-        max-width: 110px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-    }
-
-    .podium-score-badge {
-        font-size: 0.7rem;
-        font-weight: 600;
-        color: rgba(255, 255, 255, 0.85);
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    }
-
-    .podium-rank-number {
-        font-size: 1.5rem;
-        font-weight: 900;
-        color: rgba(255, 255, 255, 0.9);
-        line-height: 1;
-    }
-
-    .podium-medal {
-        font-size: 2rem;
-        line-height: 1;
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    }
-
-    /* Crown on 1st place */
-    .podium-1st .podium-medal::before {
-        content: '';
-    }
-
-    /* Spotlight glow under 1st */
-    .podium-1st::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100px;
-        height: 20px;
-        background: radial-gradient(ellipse, rgba(251, 191, 36, 0.6) 0%, transparent 70%);
-        border-radius: 50%;
-        filter: blur(6px);
-    }
-
-    /* Close button */
-    #podium-close-btn {
-        animation: fadeInUp 0.5s ease 2s both;
-    }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-</style>
-@endpush
-
-@section('content')
-
-@if ($showPodium)
-    {{-- Podium Overlay --}}
-    <div id="podium-overlay">
-        <div class="stars"></div>
-        <div class="confetti-container" id="confetti-container"></div>
-
-        <div class="relative z-10 flex flex-col items-center gap-8 px-4">
-            {{-- Title --}}
-            <div class="podium-title text-center">
-                <p class="text-yellow-300 text-lg font-semibold tracking-widest uppercase mb-1">🎉 Quiz Terminé !</p>
-                <h1 class="text-5xl font-black text-white" style="text-shadow: 0 0 30px rgba(251,191,36,0.5);">
-                    🏆 Podium Final
-                </h1>
-            </div>
-
-            {{-- Podium --}}
-            <div class="podium-stage">
-                {{-- 2nd Place --}}
-                <div class="podium-block podium-2nd" id="block-2nd">
-                    <div class="podium-player" id="player-2nd">
-                        @if ($topWinners->count() >= 2)
-                            <div class="podium-medal">🥈</div>
-                            @if ($topWinners[1]->user->profile_picture)
-                                <img src="{{ asset('storage/' . $topWinners[1]->user->profile_picture) }}" class="podium-avatar" style="object-fit:cover;" />
-                            @else
-                                <div class="podium-avatar">{{ $topWinners[1]->user->initials }}</div>
-                            @endif
-                            <div class="podium-name">{{ $topWinners[1]->user->name }}</div>
-                            <div class="podium-score-badge">{{ $topWinners[1]->total_score }} pts</div>
-                        @endif
-                    </div>
-                    <span class="podium-rank-number">2</span>
-                </div>
-
-                {{-- 1st Place --}}
-                <div class="podium-block podium-1st" id="block-1st">
-                    <div class="podium-player" id="player-1st">
-                        @if ($topWinners->count() >= 1)
-                            <div class="podium-medal">🥇</div>
-                            @if ($topWinners[0]->user->profile_picture)
-                                <img src="{{ asset('storage/' . $topWinners[0]->user->profile_picture) }}" class="podium-avatar" style="object-fit:cover;" />
-                            @else
-                                <div class="podium-avatar">{{ $topWinners[0]->user->initials }}</div>
-                            @endif
-                            <div class="podium-name">{{ $topWinners[0]->user->name }}</div>
-                            <div class="podium-score-badge">{{ $topWinners[0]->total_score }} pts</div>
-                        @endif
-                    </div>
-                    <span class="podium-rank-number">1</span>
-                </div>
-
-                {{-- 3rd Place --}}
-                <div class="podium-block podium-3rd" id="block-3rd">
-                    <div class="podium-player" id="player-3rd">
-                        @if ($topWinners->count() >= 3)
-                            <div class="podium-medal">🥉</div>
-                            @if ($topWinners[2]->user->profile_picture)
-                                <img src="{{ asset('storage/' . $topWinners[2]->user->profile_picture) }}" class="podium-avatar" style="object-fit:cover;" />
-                            @else
-                                <div class="podium-avatar">{{ $topWinners[2]->user->initials }}</div>
-                            @endif
-                            <div class="podium-name">{{ $topWinners[2]->user->name }}</div>
-                            <div class="podium-score-badge">{{ $topWinners[2]->total_score }} pts</div>
-                        @endif
-                    </div>
-                    <span class="podium-rank-number">3</span>
-                </div>
-            </div>
-
-            {{-- Close button --}}
-            <button id="podium-close-btn" onclick="document.getElementById('podium-overlay').classList.add('hidden')"
-                class="mt-2 px-8 py-3 bg-white text-purple-900 font-bold text-lg rounded-full shadow-lg hover:bg-yellow-300 hover:text-purple-900 transition-all duration-300 hover:scale-105">
-                Voir le classement complet →
-            </button>
-        </div>
-    </div>
-
-    <script>
-        (function() {
-            const CONFETTI_COLORS = ['#fbbf24', '#f59e0b', '#a78bfa', '#60a5fa', '#34d399', '#f472b6', '#fff',
-                '#fb923c'
-            ];
-
-            function createConfetti() {
-                const container = document.getElementById('confetti-container');
-                for (let i = 0; i < 120; i++) {
-                    const el = document.createElement('div');
-                    el.className = 'confetti-piece';
-                    const color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
-                    const left = Math.random() * 100;
-                    const duration = 2.5 + Math.random() * 3;
-                    const delay = Math.random() * 4;
-                    const size = 6 + Math.random() * 8;
-                    const shape = Math.random() > 0.5 ? '50%' : '0%';
-                    el.style.cssText = `
-                left:${left}%;
-                width:${size}px;
-                height:${size * 1.4}px;
-                background:${color};
-                border-radius:${shape};
-                animation-duration:${duration}s;
-                animation-delay:${delay}s;
-            `;
-                    container.appendChild(el);
-                }
-            }
-
-            function sequenceAnimation() {
-                // Rise 1st block first
-                setTimeout(() => {
-                    document.getElementById('block-1st').classList.add('rise');
-                }, 400);
-                setTimeout(() => {
-                    document.getElementById('player-1st').classList.add('show');
-                }, 900);
-
-                // Then 2nd
-                setTimeout(() => {
-                    document.getElementById('block-2nd').classList.add('rise');
-                }, 800);
-                setTimeout(() => {
-                    document.getElementById('player-2nd').classList.add('show');
-                }, 1300);
-
-                // Then 3rd
-                setTimeout(() => {
-                    document.getElementById('block-3rd').classList.add('rise');
-                }, 1100);
-                setTimeout(() => {
-                    document.getElementById('player-3rd').classList.add('show');
-                }, 1600);
-
-                // Confetti burst
-                setTimeout(createConfetti, 500);
-            }
-
-            // Start after DOM ready
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', sequenceAnimation);
-            } else {
-                sequenceAnimation();
-            }
-        })();
-    </script>
-@endif
-
-<div class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-8">Quiz</h1>
-
-        @if ($message = Session::get('success'))
-            <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-                {{ $message }}
-            </div>
-        @endif
-
-        @if ($message = Session::get('error'))
-            <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                {{ $message }}
-            </div>
-        @endif
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Main Quiz Section -->
-            <div class="lg:col-span-2">
-                @if ($activeQuiz)
-                    <div class="bg-white shadow rounded-lg p-8">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ $activeQuiz->question }}</h2>
-
-                        @if ($activeQuiz->description)
-                            <p class="text-gray-600 mb-6 text-lg">{{ $activeQuiz->description }}</p>
-                        @endif
-
-                        @if (!$userResponse)
-                            <form action="{{ route('quiz.submit') }}" method="POST">
-                                @csrf
-
-                                <div class="mb-6">
-                                    <label for="numeric_answer" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Votre réponse (nombre)
-                                    </label>
-                                    <input type="number" id="numeric_answer" name="numeric_answer" step="0.01"
-                                        required
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                                        placeholder="Entrez votre réponse...">
-                                </div>
-
-                                <button type="submit"
-                                    class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold text-lg">
-                                    Soumettre ma réponse
-                                </button>
-                            </form>
-                        @else
-                            <div class="p-6 bg-green-50 border border-green-200 rounded-lg">
-                                <p class="text-lg text-green-800 font-semibold">✓ Vous avez répondu</p>
-                                <p class="text-green-700 mt-2">Votre réponse :
-                                    <strong>{{ $userResponse->numeric_answer }}</strong>
-                                </p>
-                                <p class="text-sm text-green-600 mt-2">En attente de clôture de la question...</p>
-                            </div>
-                        @endif
-                    </div>
-                @else
-                    <div class="bg-white shadow rounded-lg p-8 text-center">
-                        <p class="text-gray-500 text-lg">En attente de la prochaine question...</p>
-                        <p class="text-gray-400 mt-2">Consultez le classement ci-contre en attendant</p>
-                    </div>
-                @endif
-            </div>
-
-            <!-- Leaderboard Section -->
-            <div class="lg:col-span-1">
-                <div class="bg-white shadow rounded-lg p-6 sticky top-8">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">🏆 Classement Global</h3>
-
-                    @if ($leaderboard->count() > 0)
-                        <div class="space-y-3">
-                            @foreach ($leaderboard as $index => $score)
-                                <div
-                                    class="flex items-center justify-between p-3 rounded-lg
-                                    {{ $index === 0 ? 'bg-yellow-50 border border-yellow-200' : 'bg-gray-50' }}
-                                    {{ auth()->id() === $score->user->id ? 'ring-2 ring-blue-500' : '' }}
-                                ">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xl font-bold text-gray-700 w-6 text-center">
-                                            {{ $index + 1 }}{{ $index === 0 ? '🥇' : ($index === 1 ? '🥈' : ($index === 2 ? '🥉' : '')) }}
-                                        </span>
-                                        <div>
-                                            <p class="font-semibold text-gray-900 text-sm">
-                                                {{ $score->user->name }}
-                                                @if (auth()->id() === $score->user->id)
-                                                    <span class="text-blue-600 font-bold">(vous)</span>
-                                                @endif
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <span class="font-bold text-lg text-gray-900">{{ $score->total_score }}</span>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <p class="text-gray-500 text-center py-4">Aucun score pour l'instant</p>
-                    @endif
-
-                    <div class="mt-6 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800">
-                        <p class="font-semibold mb-2">Système de scoring :</p>
-                        <ul class="space-y-1">
-                            <li>🥇 1er : 5 pts</li>
-                            <li>🥈 2e : 2 pts</li>
-                            <li>🥉 3e : 1 pt</li>
-                            <li>✨ +3 pts exacte</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection

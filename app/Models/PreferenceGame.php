@@ -15,11 +15,13 @@ class PreferenceGame extends Model
         'title',
         'status',
         'is_eliminatory_phase',
+        'show_podium',
         'created_by',
     ];
 
     protected $casts = [
         'is_eliminatory_phase' => 'boolean',
+        'show_podium'          => 'boolean',
     ];
 
     public function creator(): BelongsTo

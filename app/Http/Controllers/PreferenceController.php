@@ -75,6 +75,19 @@ class PreferenceController extends Controller
     private function buildState(?PreferenceGame $game, int $userId): array
     {
         if (!$game) {
+            // Check if there's a finished game with podium to show
+            $podiumGame = PreferenceGame::where('show_podium', true)
+                ->orderBy('updated_at', 'desc')
+                ->first();
+
+            if ($podiumGame) {
+                return [
+                    'status'     => 'finished',
+                    'game_title' => $podiumGame->title,
+                    'leaderboard'=> $podiumGame->getGameLeaderboard(),
+                ];
+            }
+
             return ['status' => 'waiting'];
         }
 

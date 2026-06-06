@@ -1,31 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">{{ env('APP_NAME') }}</h1>
-            <div>
-                <span class="text-gray-600 mr-4">{{ auth()->user()->name }}</span>
-                <a href="{{ route('dashboard') }}" class="text-blue-500 hover:underline mr-4">Dashboard</a>
-                @if(auth()->user()->hasRole('admin'))
-                    <a href="{{ route('admin.users') }}" class="text-purple-500 hover:underline mr-4">Admin Panel</a>
-                @endif
-                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-                    @csrf
-                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
-                        Logout
-                    </button>
-                </form>
-            </div>
-        </div>
-    </nav>
+@extends('layouts.app')
 
+@section('title', 'Modifier mon profil')
+@section('body-class', 'bg-gray-100')
+
+@section('content')
     <div class="max-w-2xl mx-auto mt-8 bg-white p-8 rounded-lg shadow-lg">
         <h2 class="text-3xl font-bold text-gray-800 mb-6">Edit Profile</h2>
 
@@ -89,19 +67,8 @@
                 <p class="text-gray-500 text-sm mt-2">Used when no profile picture is set.</p>
             </div>
 
-            <script>
-                document.querySelectorAll('.avatar-color-radio').forEach(function(radio) {
-                    radio.addEventListener('change', function() {
-                        document.querySelectorAll('.avatar-color-radio + span').forEach(function(span) {
-                            span.style.borderColor = 'transparent';
-                        });
-                        var swatch = this.nextElementSibling;
-                        swatch.style.borderColor = '#1e293b';
-                        var preview = document.getElementById('avatar-preview');
-                        if (preview) preview.style.backgroundColor = this.value;
-                    });
-                });
-            </script>
+            <div class="mb-6">
+                <label for="profile_picture" class="block text-gray-700 font-bold mb-2">Profile Picture</label>
                 @if($user->profile_picture)
                     <div class="mb-4">
                         <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover">
@@ -142,5 +109,20 @@
             </div>
         </form>
     </div>
-</body>
-</html>
+@endsection
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.avatar-color-radio').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('.avatar-color-radio + span').forEach(function(span) {
+                span.style.borderColor = 'transparent';
+            });
+            var swatch = this.nextElementSibling;
+            swatch.style.borderColor = '#1e293b';
+            var preview = document.getElementById('avatar-preview');
+            if (preview) preview.style.backgroundColor = this.value;
+        });
+    });
+</script>
+@endpush

@@ -24,18 +24,33 @@ class AdminScoreboardController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id'  => 'required|exists:users,id',
-            'points'   => 'required|integer|not_in:0',
-            'category' => 'required|in:Games,Challenges,Bonus',
-            'note'     => 'nullable|string|max:255',
+            'user_ids'    => 'required|array|min:1',
+            'user_ids.*'  => 'exists:users,id',
+            'points'      => 'required|integer|not_in:0',
+            'category'    => 'required|in:Games,Challenges,Bonus',
+            'origin'      => 'nullable|string|max:255',
+            'note'        => 'nullable|string|max:255',
         ]);
 
-        $validated['awarded_by'] = Auth::id();
+        $awardedBy = Auth::id();
 
-        ScoreboardEntry::create($validated);
+        foreach ($validated['user_ids'] as $userId) {
+            ScoreboardEntry::create([
+                'user_id'    => $userId,
+                'points'     => $validated['points'],
+                'category'   => $validated['category'],
+                'origin'     => $validated['origin'] ?? null,
+                'note'       => $validated['note'] ?? null,
+                'awarded_by' => $awardedBy,
+            ]);
+        }
 
-        return redirect()->route('admin.scoreboard.index')
-            ->with('success', 'Points ajoutés avec succès');
+        $count = count($validated['user_ids']);
+        $message = $count > 1
+            ? "Points ajoutés à {$count} joueurs avec succès"
+            : 'Points ajoutés avec succès';
+
+        return redirect()->route('admin.scoreboard.index')->with('success', $message);
     }
 
     public function destroy(ScoreboardEntry $entry)

@@ -1,29 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit User - Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">{{ env('APP_NAME') }} - Admin Panel</h1>
-            <div>
-                <span class="text-gray-600 mr-4">{{ auth()->user()->name }}</span>
-                <a href="{{ route('dashboard') }}" class="text-blue-500 hover:underline mr-4">Dashboard</a>
-                <a href="{{ route('profile.show') }}" class="text-blue-500 hover:underline mr-4">My Profile</a>
-                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-                    @csrf
-                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
-                        Logout
-                    </button>
-                </form>
-            </div>
-        </div>
-    </nav>
+@extends('layouts.app')
 
+@section('title', 'Modifier un utilisateur - Admin')
+@section('body-class', 'bg-gray-100')
+
+@section('content')
     <div class="max-w-2xl mx-auto mt-8 bg-white p-8 rounded-lg shadow-lg">
         @if (session('success'))
             <div class="mb-4 p-4 bg-green-100 text-green-700 rounded">
@@ -147,5 +127,4 @@
             </div>
         </div>
     </div>
-</body>
-</html>
+@endsection
