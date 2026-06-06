@@ -167,7 +167,10 @@ class QuizAdminController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        $leaderboard = $responses->sortByDesc('score');
+        $leaderboard = $responses->sortBy([
+            fn($r) => abs((float) $r->numeric_answer - (float) $quiz->correct_answer),
+            fn($r) => $r->created_at->timestamp,
+        ]);
 
         return view('admin.quizzes.results', compact('quiz', 'responses', 'leaderboard'));
     }

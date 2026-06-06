@@ -105,7 +105,7 @@
         <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <h3 class="font-semibold text-blue-900 mb-2">Comment fonctionne le scoring :</h3>
             <ul class="text-sm text-blue-800 space-y-1">
-                <li>🥇 1er plus proche : 5 points</li>
+                <li>🥇 1er plus proche : 4 points</li>
                 <li>🥈 2e plus proche : 2 points</li>
                 <li>🥉 3e plus proche : 1 point</li>
                 <li>✨ Bonus : +3 points si réponse exacte</li>

@@ -136,7 +136,7 @@ class QuizController extends Controller
                 'score'      => $r->score,
                 'is_me'      => $r->user_id === $userId,
             ];
-        })->sortByDesc('score')->values()->all();
+        })->values()->all();
 
         $myRank       = null;
         $myScore      = null;
