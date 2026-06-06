@@ -121,6 +121,20 @@
                                     <a href="{{ route('admin.quizzes.results', $quiz->id) }}" class="text-purple-600 hover:text-purple-900">Résultats</a>
                                 @endif
 
+                                @if ($quiz->isClosed())
+                                    @php $alreadyPushed = \App\Models\ScoreboardEntry::where('note', 'Score quiz #' . $quiz->id)->exists(); @endphp
+                                    <form action="{{ route('admin.quizzes.push-scores', $quiz->id) }}" method="POST" class="inline"
+                                          onsubmit="return confirm('Ajouter les scores de ce quiz au classement général ?')">
+                                        @csrf
+                                        <button type="submit"
+                                            class="{{ $alreadyPushed ? 'text-gray-400 cursor-not-allowed' : 'text-emerald-600 hover:text-emerald-900' }}"
+                                            {{ $alreadyPushed ? 'disabled' : '' }}
+                                            title="{{ $alreadyPushed ? 'Déjà transféré' : 'Ajouter au classement général' }}">
+                                            {{ $alreadyPushed ? '✓ Transféré' : '→ Scoreboard' }}
+                                        </button>
+                                    </form>
+                                @endif
+
                                 <form action="{{ route('admin.quizzes.destroy', $quiz->id) }}" method="POST" class="inline" onclick="return confirm('Êtes-vous sûr ?')">
                                     @csrf
                                     @method('DELETE')

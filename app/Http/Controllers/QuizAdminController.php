@@ -104,6 +104,39 @@ class QuizAdminController extends Controller
             ->with('success', 'Question fermée et scores recalculés');
     }
 
+    public function pushScores(NumericQuiz $quiz)
+    {
+        if (!$quiz->isClosed()) {
+            return redirect()->route('admin.quizzes.index')
+                ->with('error', 'Le quiz doit être fermé avant de transférer les scores.');
+        }
+
+        $noteKey = 'Score quiz #' . $quiz->id;
+
+        if (ScoreboardEntry::where('note', $noteKey)->exists()) {
+            return redirect()->back()
+                ->with('error', 'Les scores de ce quiz ont déjà été ajoutés au classement général.');
+        }
+
+        $responses = QuizResponse::where('quiz_id', $quiz->id)
+            ->where('score', '>', 0)
+            ->get();
+
+        foreach ($responses as $response) {
+            ScoreboardEntry::create([
+                'user_id'    => $response->user_id,
+                'points'     => $response->score,
+                'category'   => 'Games',
+                'origin'     => 'Quiz',
+                'note'       => $noteKey,
+                'awarded_by' => null,
+            ]);
+        }
+
+        return redirect()->back()
+            ->with('success', "Scores du quiz #{$quiz->id} ajoutés au classement général ({$responses->count()} joueurs).");
+    }
+
     public function reset(NumericQuiz $quiz)
     {
         if ($quiz->isDraft()) {
@@ -119,10 +152,9 @@ class QuizAdminController extends Controller
         // Delete all responses for this quiz
         QuizResponse::where('quiz_id', $quiz->id)->delete();
 
-        // Remove scoreboard participation points awarded when the quiz was closed
-        ScoreboardEntry::where('category', 'Auto')
-            ->where('note', 'Participation au quiz #' . $quiz->id)
-            ->delete();
+        // Remove scoreboard entries awarded when the quiz was closed
+        ScoreboardEntry::where('note', 'Participation au quiz #' . $quiz->id)->delete();
+        ScoreboardEntry::where('note', 'Score quiz #' . $quiz->id)->delete();
 
         // Reset quiz status back to 'draft'
         $quiz->update(['status' => 'draft']);

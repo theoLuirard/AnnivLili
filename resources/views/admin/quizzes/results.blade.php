@@ -8,12 +8,31 @@
                 <a href="{{ route('admin.quizzes.index') }}" class="text-blue-600 hover:text-blue-900">← Retour</a>
                 <h1 class="text-3xl font-bold text-gray-900 mt-2">Résultats - {{ substr($quiz->question, 0, 50) }}...</h1>
             </div>
-            @if($responses->count() > 0)
-                <a href="{{ route('admin.quizzes.results.download', $quiz->id) }}"
-                   class="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition font-medium">
-                    ⬇ Télécharger CSV
-                </a>
-            @endif
+            <div class="flex items-center gap-3">
+                @if($quiz->isClosed())
+                    @php $alreadyPushed = \App\Models\ScoreboardEntry::where('note', 'Score quiz #' . $quiz->id)->exists(); @endphp
+                    @if($alreadyPushed)
+                        <span class="inline-flex items-center gap-2 bg-gray-100 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium">
+                            ✓ Scores transférés
+                        </span>
+                    @else
+                        <form action="{{ route('admin.quizzes.push-scores', $quiz->id) }}" method="POST"
+                              onsubmit="return confirm('Ajouter les scores de ce quiz au classement général ?')">
+                            @csrf
+                            <button type="submit"
+                                class="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition font-medium">
+                                → Ajouter au classement général
+                            </button>
+                        </form>
+                    @endif
+                @endif
+                @if($responses->count() > 0)
+                    <a href="{{ route('admin.quizzes.results.download', $quiz->id) }}"
+                       class="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition font-medium">
+                        ⬇ Télécharger CSV
+                    </a>
+                @endif
+            </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

@@ -75,6 +75,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/admin/quizzes/{quiz}', [QuizAdminController::class, 'destroy'])->name('admin.quizzes.destroy');
         Route::get('/admin/quizzes/{quiz}/results', [QuizAdminController::class, 'showResults'])->name('admin.quizzes.results');
         Route::get('/admin/quizzes/{quiz}/results/download', [QuizAdminController::class, 'downloadResults'])->name('admin.quizzes.results.download');
+        Route::post('/admin/quizzes/{quiz}/push-scores', [QuizAdminController::class, 'pushScores'])->name('admin.quizzes.push-scores');
         Route::get('/admin/quizzes/{quiz}/live-count', [QuizAdminController::class, 'liveCount'])->name('admin.quizzes.live-count');
 
         // Quiz Finale Routes
