@@ -37,6 +37,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Joueur(s)
                             <span class="text-gray-400 font-normal">(plusieurs possibles)</span>
+                            <span id="selected-count" class="ml-2 text-blue-600 font-semibold text-xs hidden">0 sélectionné(s)</span>
                         </label>
 
                         {{-- Select all / deselect all --}}
@@ -197,9 +198,28 @@
 </div>
 @push('scripts')
 <script>
+function updateSelectedCount() {
+    const checked = document.querySelectorAll('.player-checkbox:checked').length;
+    const el = document.getElementById('selected-count');
+    if (checked > 0) {
+        el.textContent = checked + ' sélectionné(s)';
+        el.classList.remove('hidden');
+    } else {
+        el.classList.add('hidden');
+    }
+}
+
 function toggleAllPlayers(check) {
     document.querySelectorAll('.player-checkbox').forEach(cb => cb.checked = check);
+    updateSelectedCount();
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.player-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateSelectedCount);
+    });
+    updateSelectedCount();
+});
 </script>
 @endpush
 @endsection
