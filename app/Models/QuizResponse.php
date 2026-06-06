@@ -42,10 +42,11 @@ class QuizResponse extends Model
         }
 
         // Rank by proximity, speed (created_at) as tiebreaker
+        // values() resets keys to positional indexes so search() returns the rank position
         $sorted = $allResponses->sortBy([
             fn($r) => abs((float) $r->numeric_answer - $correct),
             fn($r) => $r->created_at->timestamp,
-        ]);
+        ])->values();
         $rank = $sorted->search(fn($r) => $r->id === $this->id);
 
         $exactBonus = ((float) $this->numeric_answer === $correct) ? 3 : 0;
